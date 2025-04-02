@@ -1,5 +1,3 @@
-import psycopg2
-
 def format_usd(num):
     if ((type(num) != int) and (type(num) != float)):
         return num
