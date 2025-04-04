@@ -1,0 +1,14 @@
+Features:
+    - transactions:
+        - search
+        - filter
+        - input/add: 
+            - amount
+            - category
+            - date
+        - update
+        - delete
+    - view account:
+        - current balance
+        - summaries of income/expenses over time
+        - show patterns with expenses categories

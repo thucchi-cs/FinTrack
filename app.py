@@ -1,59 +1,97 @@
-import os
-from flask import Flask, render_template, redirect, request
+from flask import Flask, render_template, redirect, request, flash, session, get_flashed_messages
+from flask_session import Session
 from supabase import create_client, Client
-import helpers as h
+from helpers import *
+from werkzeug.security import generate_password_hash
+
 
 app = Flask(__name__)
 # flask run --debug
 
-app.jinja_env.filters["usd"] = h.format_usd
+app.jinja_env.filters["usd"] = format_usd
 
-# Database url: https://wdtglfihqmsivautmzns.supabase.co
-# Database key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndkdGdsZmlocW1zaXZhdXRtem5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzMzNzA0NzEsImV4cCI6MjA0ODk0NjQ3MX0.yVeFrOB9kQYMZoWteougoU5bbvCUTvN4CtZbfZHZq1g
+app.config["SESSION_PERMANENT"] = False
+app.config["SESSION_TYPE"] = "filesystem"
+Session(app)
 
-db_url = "https://wdtglfihqmsivautmzns.supabase.co"
-db_key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndkdGdsZmlocW1zaXZhdXRtem5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzMzNzA0NzEsImV4cCI6MjA0ODk0NjQ3MX0.yVeFrOB9kQYMZoWteougoU5bbvCUTvN4CtZbfZHZq1g"
+# Database url: https://afrkbgvvhkkhujmskchj.supabase.co
+# Database key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFmcmtiZ3Z2aGtraHVqbXNrY2hqIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0MzY1MDUzMiwiZXhwIjoyMDU5MjI2NTMyfQ.4w1zk-9Jx9xUo-7TWwbHywKmFJO0DkRkllicFjiHLLs
+
+db_url = "https://afrkbgvvhkkhujmskchj.supabase.co"
+db_key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFmcmtiZ3Z2aGtraHVqbXNrY2hqIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0MzY1MDUzMiwiZXhwIjoyMDU5MjI2NTMyfQ.4w1zk-9Jx9xUo-7TWwbHywKmFJO0DkRkllicFjiHLLs"
 db: Client = create_client(db_url, db_key)
 
-min_price = None
-max_price = None
-min_cal = None
-max_cal = None
-
+# Website homepage
 @app.route("/", methods=["POST", "GET"])
 def index():
-    sort = "id"
-    desc = False
+    return render_template("index.html")
+
+# User's dashboard
+@app.route("/dashboard")
+@login_required
+def dashboard():   
+    # Get user data
+    user = list(db.table("users").select("*").eq("id", session.get("user_id")).execute())[0][1][0]
+    
+    # Go to user's dashboard
+    return render_template("dashboard.html", username=user["username"], date_joined=user["date_joined"])
+
+# Login page
+@app.route("/login", methods=["POST", "GET"])
+def login():    
+    # Login request
     if request.method == "POST":
-        sort = request.form.get("sort_by")
-        desc = request.form.get("reverse")
-    menu = list(db.table("menu").select("*").order(sort, desc=desc).execute())[0][1]
-    keys = list(menu[0].keys())
-    keys.remove("id")
-    return render_template("index.html", menu=menu, keys=keys, sort=sort, desc=desc)
+        # Get input from page
+        username = request.form.get("username")
+        password = request.form.get("password")
+        
+        # Check if inputs are valid
+        if check_valid_login(db, username, password):
+            # Log in the user for the current session
+            user_id = list(db.table("users").select("id").eq("username", username).execute())[0][1][0]['id']
+            session['user_id'] = user_id
+            
+            # Go to user's dashboard
+            return redirect("/dashboard")
+        
+    
+    # Go to login page
+    return render_template("login.html")
 
-@app.route("/add", methods=["GET", "POST"])
-def add():
+# Register page
+@app.route("/register", methods=["POST", "GET"])
+def register():
+    # Register request
     if request.method == "POST":
-        db.table("menu").insert({"name": request.form.get("food"), "price": request.form.get("price"), "calories": request.form.get("calories")}).execute()
-        return redirect("/")
-    return render_template("add.html")
+        # Get fields filled out from page
+        username = request.form.get("username")
+        password = request.form.get("password")
+        password2 = request.form.get("password2")
+        
+        # Check for input validity
+        if check_valid_registration(db, username, password, password2):
+            # Hash password for security
+            hashed_password = generate_password_hash(password)
+        
+            # Add user to database
+            db.table("users").insert({"username": username, "password_hash": hashed_password}).execute()
+            
+            # Login user to the current session
+            user_id = list(db.table("users").select("id").eq("username", username).execute())[0][1][0]['id']
+            session['user_id'] = user_id
+            
+            # Direct user to dashboard
+            return redirect("/dashboard")
+        
+    
+    # Go to register page
+    return render_template("register.html")
 
-@app.route("/del", methods=["POST"])
-def delete():
-    db.table("menu").delete().eq("id", request.form.get("id")).execute()
-    return redirect("/")
-
-@app.route("/edit", methods=["POST"])
-def edit():
-    item = {'id': request.form.get("id"), "name": request.form.get("food"), "price": request.form.get("price"), "calories": request.form.get("calories")}
-    return render_template("edit.html", item=item)
-
-@app.route("/edited", methods=["POST"])
-def edited():
-    id = request.form.get("id")
-    name = request.form.get("food")
-    price = request.form.get("price")
-    calories = request.form.get("calories")
-    db.table('menu').update({"name": name, "price": price, "calories": calories}).eq("id", id).execute()
+# User logs out
+@app.route("/logout")
+def logout():
+    # Clear current session
+    session.clear()
+    
+    # Return to website homepage
     return redirect("/")
