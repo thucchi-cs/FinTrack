@@ -4,6 +4,7 @@ document.addEventListener("click", function() {
     console.log("clock")
 })
 
+console.log(window.location.pathname)
 console.log("js")
 console.log(session);
 
@@ -26,28 +27,41 @@ function countDecimalPlaces(number) {
     return number.length;
 }
 
-let addTransaction = document.querySelector("#add_transaction")
-addTransaction.addEventListener("submit", function() {
-    let amount = addTransaction.querySelector("#add_transac_amount").value;
-    let type = addTransaction.querySelector("#add_transac_type").value;
-    let category = addTransaction.querySelector("#add_transac_category").value;
-    let date = addTransaction.querySelector("#add_transac_date").value;
-    console.log(date)
+if (window.location.pathname == "/add_transaction"){
+    let addTransaction = document.querySelector("#add_transaction")
+    addTransaction.addEventListener("submit", function() {
+        let amount = addTransaction.querySelector("#add_transac_amount").value;
+        let type = addTransaction.querySelector("#add_transac_type").value;
+        let category = addTransaction.querySelector("#add_transac_category").value;
+        let date = addTransaction.querySelector("#add_transac_date").value;
+        console.log("hiiiiii")
+        
+        if (!amount || !type || !date) {
+            sendSession("flash", "All required fields must be filled out!");
+            return;
+        }
     
-    if (!amount || !type || !date) {
-        sendSession("flash", "All required fields must be filled out!");
-        return;
-    }
+        if (countDecimalPlaces(amount) > 2 || parseInt(amount) <= 0) {
+            sendSession("flash", "Invalid amount for transaction!")
+            return
+        }
+    
+        let today = new Date();
+        date = new Date(date);
+        console.log(today, date)
+        if (date > today) {
+            sendSession("flash", "Invalid date!")
+            return;
+        }
+    })
+}
 
-    if (countDecimalPlaces(amount) > 2 || amount == 0) {
-        sendSession("flash", "Invalid amount for transaction!")
-        return
+if (window.location.pathname == "/transactions") {
+    let deleteTransaction = document.querySelectorAll("#delete_transaction");
+    for (let i = 0; i < deleteTransaction.length; i++) {
+        deleteTransaction[i].querySelector("#delete_button").addEventListener("submit", () => {
+            console.log("submit delete")
+            deleteTransaction[i].querySelector("#confirm_delete").hidden = false;
+        })
     }
-
-    let today = new Date();
-    date = new Date(date);
-    if (date > today) {
-        sendSession("flash", "Invalid date!")
-        return;
-    }
-})
+}

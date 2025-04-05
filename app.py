@@ -11,6 +11,8 @@ app = Flask(__name__)
 
 app.jinja_env.filters["usd"] = format_usd
 app.jinja_env.filters["abs"] = absolute
+app.jinja_env.globals["today"] = get_today
+# app.jinja_env.
 
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
@@ -167,7 +169,6 @@ def edited_transaction():
 
     # Find updated difference 
     difference = amount - list(db.table("transactions").select("*").eq("transaction_id", request.form.get("id")).execute())[0][1][0]["amount"]
-    print(difference)
     
     try:
         # Add transaction to database table 'transactions'
@@ -180,6 +181,23 @@ def edited_transaction():
     current_balance = get_user_balance(db, session.get("user_id"))
     db.table("balances").update({"current_balance": current_balance+difference}).eq("user_id", session.get("user_id")).execute()
     
+    return redirect("/transactions")
+
+# Delete a transaction
+@app.route("/delete_transaction", methods=["POST"])
+def delete_transaction():
+    # Get id and amount of transaction to be deleted
+    id = request.form.get("id")
+    amount = list(db.table("transactions").select("*").eq("transaction_id", request.form.get("id")).execute())[0][1][0]["amount"]
+    
+    # Delete transaction from database
+    db.table("transactions").delete().eq("transaction_id", id).execute()
+    
+    # Update user's balance
+    current_balance = get_user_balance(db, session.get("user_id"))
+    db.table("balances").update({"current_balance": current_balance-amount}).eq("user_id", session.get("user_id")).execute()
+    
+    # Return to transactions page
     return redirect("/transactions")
         
 # Update session from script.js

@@ -17,7 +17,7 @@
                 <option value="thing1">thing</option>
                 <option value="thing2">thing 2.0</option>
             </select>
-            <input type="date" autocomplete="off" name="date" placeholder="Date of Transaction" id="add_transac_date">
+            <input type="date" autocomplete="off" name="date" placeholder="Date of Transaction" id="add_transac_date" value={{today()}}>
             <button type="submit">Add</button>
         </form>
     {% elif edit %}

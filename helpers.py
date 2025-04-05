@@ -1,3 +1,4 @@
+from datetime import date
 from flask import redirect, render_template, session, flash
 from functools import wraps
 from werkzeug.security import check_password_hash
@@ -12,6 +13,9 @@ def format_usd(num):
 # Get absolute value of number
 def absolute(num):
     return abs(num)
+
+def get_today():
+    return date.today()
 
 # Check if currently logged in
 def login_required(f):

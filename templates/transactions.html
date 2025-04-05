@@ -33,6 +33,21 @@
                             <button type="submit">Edit</button>
                         </form>
                     </td>
+
+                    <td>
+                        <span id="delete_transaction">
+                            <form id="delete_button" onsubmit="return false">
+                                <button type="submit">Delete</button>
+                            </form>
+                            <span hidden id="confirm_delete">
+                                Delete?
+                                <form action="/delete_transaction" method="post">
+                                    <input hidden value={{t["transaction_id"]}} name="id">
+                                    <button type="submit">Confirm</button>
+                                </form>
+                            </span>
+                        </span>
+                    </td>
                 </tr>
     
             {% endfor %}
