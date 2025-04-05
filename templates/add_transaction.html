@@ -1,0 +1,43 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+
+    hii
+    add/edit transactions
+    {% if add %}
+        <form action="/add_transaction" method="post" id="add_transaction">
+            <input type="number" step="0.01" autocomplete="off" name="amount" placeholder="Amount" id="add_transac_amount">
+            <select name="type" id="add_transac_type">
+                <option selected disabled>Type</option>
+                <option value="income">income</option>
+                <option value="expense">expense</option>
+            </select>
+            <select name="category" id="add_transac_category">
+                <option selected disabled>Category</option>
+                <option value="thing1">thing</option>
+                <option value="thing2">thing 2.0</option>
+            </select>
+            <input type="date" autocomplete="off" name="date" placeholder="Date of Transaction" id="add_transac_date">
+            <button type="submit">Add</button>
+        </form>
+    {% elif edit %}
+        <form action="/edited_transaction" method="post" id="add_transaction">
+            <input type="number" step="0.01" autocomplete="off" name="amount" placeholder="Amount" id="add_transac_amount" value={{info["amount"]|abs}}>
+            <select name="type" id="add_transac_type">
+                <option selected disabled>Type</option>
+                <option value="income" {% if info["amount"] > 0 %} selected {% endif %}>income</option>
+                <option value="expense" {% if info["amount"] < 0 %} selected {% endif %}>expense</option>
+            </select>
+            <select name="category" id="add_transac_category">
+                <option selected disabled>Category</option>
+                <option value="thing1">thing</option>
+                <option value="thing2">thing 2.0</option>
+            </select>
+            <input type="date" autocomplete="off" name="date" placeholder="Date of Transaction" id="add_transac_date" value={{info["date_transacted"]}}>
+            <input hidden value={{info["transaction_id"]}} name="id">
+            <button type="submit">Update</button>
+        </form>
+
+    {% endif %}
+
+{% endblock %}

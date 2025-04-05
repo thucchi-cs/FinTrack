@@ -1,5 +1,3 @@
-import requests
-
 from flask import redirect, render_template, session, flash
 from functools import wraps
 from werkzeug.security import check_password_hash
@@ -10,6 +8,10 @@ def format_usd(num):
     if ((type(num) != int) and (type(num) != float)):
         return num
     return f'$%0.2f' % float(num)
+
+# Get absolute value of number
+def absolute(num):
+    return abs(num)
 
 # Check if currently logged in
 def login_required(f):
@@ -100,3 +102,14 @@ def check_valid_login(db, username, password):
     
     # All inputs are valid
     return True
+
+# Log in user
+def set_session_user(db, username):
+    user_id = list(db.table("users").select("id").eq("username", username).execute())[0][1][0]['id']
+    session['user_id'] = user_id
+    session['username'] = username
+    
+# Get user's balance from database
+def get_user_balance(db, user_id):
+    balance = list(db.table("balances").select("current_balance").eq("user_id", user_id).execute())[0][1][0].get("current_balance")
+    return balance

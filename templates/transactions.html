@@ -1,0 +1,45 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+
+    hii
+    transactions
+    <form action="/add_transaction" method="get">
+        <button type="submit">Add Transaction</button>
+    </form>
+
+    {% if has_transactions %}
+        <table>
+            <th>Type</th>
+            <th>Amount</th>
+            <th>Category</th>
+            <th>Date</th>
+
+            {% for t in transactions %}
+    
+                <tr>
+                    {% if t["amount"] < 0%}
+                        <td>Expense</td>
+                    {% else %}
+                        <td>Income</td>
+                    {% endif %}
+                    <td>{{(t["amount"]|abs)|usd}}</td>
+                    <td>{{t["category"]}}</td>
+                    <td>{{t["date_transacted"]}}</td>
+                    
+                    <td>
+                        <form action="/edit_transaction" method="post">
+                            <input hidden value={{t["transaction_id"]}} name="id">
+                            <button type="submit">Edit</button>
+                        </form>
+                    </td>
+                </tr>
+    
+            {% endfor %}
+   
+        </table>
+
+    
+    {% endif %}
+
+{% endblock %}
