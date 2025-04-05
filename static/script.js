@@ -57,11 +57,14 @@ if (window.location.pathname == "/add_transaction"){
 }
 
 if (window.location.pathname == "/transactions") {
-    let deleteTransaction = document.querySelectorAll("#delete_transaction");
-    for (let i = 0; i < deleteTransaction.length; i++) {
-        deleteTransaction[i].querySelector("#delete_button").addEventListener("submit", () => {
-            console.log("submit delete")
-            deleteTransaction[i].querySelector("#confirm_delete").hidden = false;
+    let confirmationNeeded = document.querySelectorAll("#confirmation_needed_action");
+    for (let i = 0; i < confirmationNeeded.length; i++) {
+        confirmationNeeded[i].querySelector("#action_button").addEventListener("submit", () => {
+            confirmationNeeded[i].querySelector("#confirm_action").hidden = false;
+        })
+
+        confirmationNeeded[i].querySelector("#cancel_action").addEventListener("submit", () => {
+            confirmationNeeded[i].querySelector("#confirm_action").hidden = true;
         })
     }
 }

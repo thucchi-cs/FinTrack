@@ -17,7 +17,7 @@
 
             {% for t in transactions %}
     
-                <tr>
+                <tr {% if t["deleted"] %} style="color:red;" {% endif %}>
                     {% if t["amount"] < 0%}
                         <td>Expense</td>
                     {% else %}
@@ -28,22 +28,27 @@
                     <td>{{t["date_transacted"]}}</td>
                     
                     <td>
-                        <form action="/edit_transaction" method="post">
-                            <input hidden value={{t["transaction_id"]}} name="id">
-                            <button type="submit">Edit</button>
-                        </form>
+                        {% if not t["deleted"] %}
+                            <form action="/edit_transaction" method="post">
+                                <input hidden value={{t["transaction_id"]}} name="id">
+                                <button type="submit">Edit</button>
+                            </form>
+                        {% endif %}
                     </td>
 
                     <td>
-                        <span id="delete_transaction">
-                            <form id="delete_button" onsubmit="return false">
-                                <button type="submit">Delete</button>
+                        <span id="confirmation_needed_action">
+                            <form id="action_button" onsubmit="return false">
+                                <button type="submit">{% if not t["deleted"] %}Delete{% else %}Restore{% endif %}</button>
                             </form>
-                            <span hidden id="confirm_delete">
-                                Delete?
-                                <form action="/delete_transaction" method="post">
+                            <span hidden id="confirm_action">
+                                {% if not t["deleted"] %}Delete?{% else %}Restore?{% endif %}
+                                <form action={% if not t["deleted"] %}"/delete_transaction"{% else %}"/restore_transaction"{% endif %} method="post">
                                     <input hidden value={{t["transaction_id"]}} name="id">
                                     <button type="submit">Confirm</button>
+                                </form>
+                                <form id="cancel_action" onsubmit="return false">
+                                    <button type="submit">Cancel</button>
                                 </form>
                             </span>
                         </span>

@@ -191,11 +191,28 @@ def delete_transaction():
     amount = list(db.table("transactions").select("*").eq("transaction_id", request.form.get("id")).execute())[0][1][0]["amount"]
     
     # Delete transaction from database
-    db.table("transactions").delete().eq("transaction_id", id).execute()
+    db.table("transactions").update({"deleted": True}).eq("transaction_id", id).execute()
     
     # Update user's balance
     current_balance = get_user_balance(db, session.get("user_id"))
     db.table("balances").update({"current_balance": current_balance-amount}).eq("user_id", session.get("user_id")).execute()
+    
+    # Return to transactions page
+    return redirect("/transactions")
+
+# Restore a deleted transaction
+@app.route("/restore_transaction", methods=["POST"])
+def restore_transaction():
+    # Get id and amount of transaction to be deleted
+    id = request.form.get("id")
+    amount = list(db.table("transactions").select("*").eq("transaction_id", request.form.get("id")).execute())[0][1][0]["amount"]
+    
+    # Restore transaction from database
+    db.table("transactions").update({"deleted": False}).eq("transaction_id", id).execute()
+    
+    # Update user's balance
+    current_balance = get_user_balance(db, session.get("user_id"))
+    db.table("balances").update({"current_balance": current_balance+amount}).eq("user_id", session.get("user_id")).execute()
     
     # Return to transactions page
     return redirect("/transactions")
