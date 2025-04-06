@@ -39,14 +39,12 @@
             </nav>
         </header>
 
-        {% if get_flashed_messages() %}
         <header>
-            <div class="alert alert-primary alert-dismissible text-center fade show" role="alert" id="flash-msg">
-                {{ get_flashed_messages() | join(" ") }}
+            <div class="alert alert-primary alert-dismissible text-center fade show" role="alert" id="flash-msg" {% if not get_flashed_messages() %} hidden {% endif %}>
+                <span id="msg">{{ get_flashed_messages() | join(" ") }}</span>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         </header>
-        {% endif %}
 
         {% block body %}
         {% endblock %}

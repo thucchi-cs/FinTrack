@@ -12,3 +12,11 @@ Features:
         - current balance
         - summaries of income/expenses over time
         - show patterns with expenses categories
+
+
+Task:
+    - flash msg with js
+    - user's info with registration
+    - user's account page
+    - display/sort/filter transactions
+    - graphs/visuals of account summaries

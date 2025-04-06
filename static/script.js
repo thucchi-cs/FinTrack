@@ -27,22 +27,28 @@ function countDecimalPlaces(number) {
     return number.length;
 }
 
-if (window.location.pathname == "/add_transaction"){
+function flashMsg(msg) {
+    let flash = document.querySelector("#flash-msg")
+    flash.hidden = false;
+    flash.querySelector("#msg").innerHTML = msg
+    console.log("hi")
+}
+
+if ((window.location.pathname == "/add_transaction") || (window.location.pathname == "/edit_transaction")){
     let addTransaction = document.querySelector("#add_transaction")
-    addTransaction.addEventListener("submit", function() {
+    addTransaction.querySelector("#btn").addEventListener("click", function() {
         let amount = addTransaction.querySelector("#add_transac_amount").value;
         let type = addTransaction.querySelector("#add_transac_type").value;
         let category = addTransaction.querySelector("#add_transac_category").value;
         let date = addTransaction.querySelector("#add_transac_date").value;
-        console.log("hiiiiii")
         
         if (!amount || !type || !date) {
-            sendSession("flash", "All required fields must be filled out!");
+            flashMsg("All required fields must be filled out!");
             return;
         }
     
         if (countDecimalPlaces(amount) > 2 || parseInt(amount) <= 0) {
-            sendSession("flash", "Invalid amount for transaction!")
+            flashMsg("Invalid amount for transaction!")
             return
         }
     
@@ -50,9 +56,11 @@ if (window.location.pathname == "/add_transaction"){
         date = new Date(date);
         console.log(today, date)
         if (date > today) {
-            sendSession("flash", "Invalid date!")
+            flashMsg("Invalid date!")
             return;
         }
+
+        addTransaction.submit()
     })
 }
 
@@ -62,7 +70,7 @@ if (window.location.pathname == "/transactions") {
         confirmationNeeded[i].querySelector("#action_button").addEventListener("submit", () => {
             confirmationNeeded[i].querySelector("#confirm_action").hidden = false;
         })
-
+        
         confirmationNeeded[i].querySelector("#cancel_action").addEventListener("submit", () => {
             confirmationNeeded[i].querySelector("#confirm_action").hidden = true;
         })

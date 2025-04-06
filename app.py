@@ -103,12 +103,27 @@ def logout():
     return redirect("/")
 
 # Transactions page
-@app.route("/transactions")
+@app.route("/transactions", methods=["POST", "GET"])
 @login_required
 def transactions():
-    user_transactions = list(db.table("transactions").select("*").eq("user_id", session['user_id']).order("date_transacted").execute())[0][1]
+    orders = {"date_transacted": "Date", "abs_amount": "Amount"}
+    sort_by = "date_transacted"
+    min_val = None
+    max_val = None
+    income = True
+    expense = True
+    desc = False
+    if request.method == "POST":
+        sort_by = request.form.get("sort")
+        desc = request.form.get("reverse")
+    desc = not desc
+    print(desc)
+    user_transactions = list(db.table("transactions").select("*").eq("user_id", session['user_id']).order(sort_by, desc=desc).execute())[0][1]
+    smth = list(db.table("transactions").select("*").eq("user_id", session['user_id']).gte("abs_amount", 30).lte("abs_amount", 60).execute())[0][1]
+    print(smth)
     has_transactions = len(user_transactions) > 0
-    return render_template("transactions.html", transactions=user_transactions, has_transactions=has_transactions)
+
+    return render_template("transactions.html", transactions=user_transactions, has_transactions=has_transactions, sort=sort_by, order_keys=orders.keys(), orders=orders, desc=not desc)
 
 # Add a transaction
 @app.route("/add_transaction", methods=["POST", "GET"])
@@ -130,7 +145,15 @@ def add_transaction():
 
         try:
             # Add transaction to database table 'transactions'
-            db.table("transactions").insert({"user_id": session.get("user_id"), "amount":amount, "date_transacted": date_transacted, "date_added": str(today), "category": category}).execute()
+            data = {
+                "user_id": session.get("user_id"), 
+                "amount": amount, 
+                "abs_amount": abs(amount),
+                "date_transacted": date_transacted, 
+                "date_added": str(today), 
+                "category": category
+            }
+            db.table("transactions").insert(data).execute()
         except:
             flash("Invalid input!")
             return redirect("/add_transaction")
@@ -172,7 +195,13 @@ def edited_transaction():
     
     try:
         # Add transaction to database table 'transactions'
-        db.table("transactions").update({"amount": amount, "date_transacted": date_transacted, "category": category}).eq("transaction_id", id).execute()
+        data = {
+            "amount": amount,
+            "abs_amount": abs(amount),
+            "date_transacted": date_transacted,
+            "category": category
+        }
+        db.table("transactions").update(data).eq("transaction_id", id).execute()
     except:
         flash("Invalid input!")
         return redirect("/transactions")
