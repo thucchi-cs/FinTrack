@@ -1,5 +1,6 @@
-from datetime import date
-from flask import Flask, render_template, redirect, request, flash, session, get_flashed_messages
+from calendar import monthrange
+from datetime import date, timedelta
+from flask import Flask, render_template, redirect, request, flash, session, get_flashed_messages, jsonify
 from flask_session import Session
 from supabase import create_client, Client
 from helpers import *
@@ -101,6 +102,12 @@ def logout():
     
     # Return to website homepage
     return redirect("/")
+
+# Analysis page
+@app.route("/analysis")
+@login_required
+def analysis():
+    return render_template("analysis.html")
 
 # Transactions page
 @app.route("/transactions", methods=["POST", "GET"])
@@ -252,3 +259,62 @@ def update_session():
     data = request.get_json()
     session[data.get("key")] = data.get("value")
     return 'Session updated'
+
+# Get user's income data for chart analysis
+@app.route("/income")
+def get_income_data():
+    today = date.today()
+    week = True if request.args.get("periods", "weeks") == "weeks" else False
+    if week:
+        label = "week "
+        days_difference = (today.weekday() + 1) % 7
+        begin = today - timedelta(days=days_difference)
+        end = begin + timedelta(days=6)
+        date_ranges = [{
+            "begin": begin,
+            "end": end
+        }]
+        for i in range(5):
+            begin -= timedelta(days=7)
+            end = begin + timedelta(days=6)
+            date_ranges.insert(0, {
+                "begin": begin,
+                "end": end
+            })
+        
+        for i in date_ranges:
+            print(i)
+    else:
+        label = "month "
+        month = today.month
+        year = today.year
+        
+        begin = date(year, month, 1)
+        end = date(year, month, monthrange(year, month)[1])
+
+        date_ranges = [{
+            "begin": begin,
+            "end": end
+        }]
+        for i in range(5):
+            month -= 1
+            if month < 1:
+                month = 12 - month
+                year -= 1
+            print(month)
+            begin = date(year, month, 1)
+            end = date(year, month, monthrange(year, month)[1])
+            date_ranges.insert(0, {
+                "begin": begin,
+                "end": end
+            })
+    
+    labels = [label + str(i) for i in range(len(date_ranges))] 
+    values = []      
+    for r in date_ranges:
+        response = db.table("transactions").select("abs_amount").eq("user_id", session["user_id"]).gt("amount", 0).gte("date_transacted", r["begin"]).lte("date_transacted", r["end"]).execute()
+        data = response.data
+        data = [i["abs_amount"] for i in data]
+        values.append(sum(data))
+        
+    return jsonify({"labels":labels, "values": values})

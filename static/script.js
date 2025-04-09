@@ -76,3 +76,66 @@ if (window.location.pathname == "/transactions") {
         })
     }
 }
+
+function createBarGraph(element, labels, values, colors, title) {
+    let data = {
+        labels: labels,
+        datasets: [{
+            data: values,
+            backgroundColor: colors
+        }]
+    }
+    
+    new Chart(
+        element, {
+        type: "bar",
+        data: data,
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: true,
+                    labels: {
+                        generateLabels: (chart) => {
+                          // Manually map each color to a label
+                          return chart.data.labels.map((label, index) => ({
+                            text: label,
+                            fillStyle: chart.data.datasets[0].backgroundColor[index],
+                            strokeStyle: chart.data.datasets[0].backgroundColor[index],
+                            index: index
+                          }));
+                        }
+                    }
+                },
+                title: {
+                    display: true,
+                    text: title
+                }
+            }
+        }
+    })
+    
+}
+
+function createIncomeChart(period) {
+    fetch(`/income?periods=${period}`)
+        .then(response => response.json())
+        .then(result => {
+            ctx = document.getElementById("income_chart")
+            colors = [
+                "rbg(0,255,255)",
+                "rbg(0,255,255)",
+                "rbg(0,255,255)",
+                "rbg(0,255,0)",
+                "rbg(0,255,0)",
+                "rbg(0,255,0)"
+            ]
+            console.log(result)
+            createBarGraph(ctx, result.labels, result.values, colors, "Income over 6 weeks")
+        })
+}
+
+if (window.location.pathname == "/analysis") {
+    createIncomeChart("month")
+    console.log("done?")
+}
