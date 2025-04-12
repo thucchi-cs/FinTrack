@@ -81,13 +81,16 @@ function createBarGraph(element, labels, values, colors, title) {
     let avg = values.reduce((a, b) => a + b, 0)
     avg /= values.length
     avgData = Array(values.length).fill(avg)
+
     let data = {
         labels: labels,
         datasets: [{
             data: values,
             backgroundColor: colors,
-            order: 2
-        }, 
+            order: 2,
+            borderColor: "green",
+            borderWidth: 2
+        } ,
         {
             data: avgData,
             type: "line",
@@ -95,13 +98,14 @@ function createBarGraph(element, labels, values, colors, title) {
             borderDash: [20,10],
             pointRadius: 0,
             pointHitRadius: 100,
-            segment: {
-                hitRadius: 100
-            },
+            // segment: {
+            //     hitRadius: 100
+            // },
             tension: 0,
             label: "avg",
             order: 1
-        }]
+        }
+        ]
     }
 
 
@@ -113,19 +117,8 @@ function createBarGraph(element, labels, values, colors, title) {
             responsive: true,
             plugins: {
                 legend: {
-                    display: true,
-                    position: "top",
-                    labels: {
-                        generateLabels: (chart) => {
-                          // Manually map each color to a label
-                          return chart.data.labels.map((label, index) => ({
-                            text: label,
-                            fillStyle: chart.data.datasets[0].backgroundColor[index],
-                            strokeStyle: chart.data.datasets[0].backgroundColor[index],
-                            index: index
-                          }));
-                        }
-                    }
+                    display: false,
+                    position: "top"
                 },
                 title: {
                     display: true,
@@ -151,49 +144,22 @@ function createBarGraph(element, labels, values, colors, title) {
     
 }
 
-function createAnalysisChart(period, type) {
-    let chart;
-    fetch(`/get_chart_data?periods=${period}&type=${type}`)
-        .then(response => response.json())
-        .then(result => {
-            ctx = document.getElementById("income_chart_weeks")
-            // ctx = document.getElementById(type+"_chart_"+period)
-            colors = [
-                "rbg(0,255,255)",
-                "rbg(0,255,255)",
-                "rbg(0,255,255)",
-                "rbg(0,255,0)",
-                "rbg(0,255,0)",
-                "rbg(0,255,0)"
-            ]
-            return createBarGraph(ctx, result.labels, result.values, colors, type+" over 6 " +period)
-        })
-    console.log(chart)
-    return chart
-}
-
 async function createAnalysisCharts(period, type) {
     const response = await fetch(`/get_chart_data?periods=${period}&type=${type}`)
     const result = await response.json()
 
     ctx = document.getElementById("analysis_chart")
     // ctx = document.getElementById(type+"_chart_"+period)
-    colors = [
-        "rbg(0,255,255)",
-        "rbg(0,255,255)",
-        "rbg(0,255,255)",
-        "rbg(0,255,0)",
-        "rbg(0,255,0)",
-        "rbg(0,255,0)"
-    ]
+    colors = Array(result.values.length).fill("rgba(8, 145, 8, 0.59)")
     let chart = createBarGraph(ctx, result.labels, result.values, colors, type+" over 6 " +period)
     console.log("2nd", result)
     return chart
 }
 
 async function displayCharts() {
-    let chart = await createAnalysisCharts("weeks", "income")
-    console.log("hi", chart)
+    let analysisChart = await createAnalysisCharts("weeks", "income")
+    let categories_chart = await createCategoriesChart("frequency")
+
     options = document.getElementById("analysis_options")
     let period = "weeks"
     let transac_type = "income"
@@ -201,20 +167,140 @@ async function displayCharts() {
         timePeriods = options.querySelector("#time_period_analysis").value
         console.log(timePeriods)
         period = timePeriods
-        chart.destroy()
-        chart = await createAnalysisCharts(period, transac_type)
+        analysisChart.destroy()
+        analysisChart = await createAnalysisCharts(period, transac_type)
     })
     
     options.querySelector("#transaction_type_analysis").addEventListener("change", async () => {
         type = options.querySelector("#transaction_type_analysis").value
         console.log(type)
         transac_type = type
-        chart.destroy()
-        chart = await createAnalysisCharts(period, transac_type)
+        analysisChart.destroy()
+        analysisChart = await createAnalysisCharts(period, transac_type)
     })
-    console.log("done?")
+
+    sortOptions = document.getElementById("categories_options")
+    let sort = "frequency"
+    sortOptions.querySelector("#categories_sort_type").addEventListener("change", async () => {
+        sort = sortOptions.querySelector("#categories_sort_type").value
+        categories_chart.destroy()
+        categories_chart = await createCategoriesChart(sort)
+    })
+}
+
+function createLineGraph(element, labels, values, color, title) {
+    let data = {
+        labels: labels,
+        datasets: [{
+            data: values,
+            borderColor: color,
+            borderWidth: 5,
+            pointHitRadius: 10
+        }]
+    }
+
+    console.log("data", values)
+
+    return new Chart(
+        element, {
+        type: "line",
+        data: data,
+        options: {   
+            interaction: {
+                mode: 'nearest',     // only show the closest item
+                intersect: false     // allow hover without being exactly on the point
+              },
+            responsive: true,
+            plugins: {
+                tooltip: {
+                    mode: 'nearest',   // can also try 'index' if you want crosshair behavior
+                    intersect: false,  // makes the tooltip follow cursor along the line
+                  },
+                legend: {
+                    display: false,
+                    position: "top"
+                },
+                title: {
+                    display: true,
+                    text: title
+                }
+            },
+            scales: {
+                x: {
+                    // type: "time",
+                    // time: {
+                    //     unit: "day"
+                    //     // tooltipFormat: "MMM d",
+                    //     // displayFormats: {
+                    //     //     day: "MMM d"
+                    //     // }
+                    // },
+                    min: 1,
+                    max: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate()
+                },
+                y: {
+                    beginAtZero: false
+                }
+            }
+        }
+    })
+    
+}
+console.log(new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate())
+async function createBalanceChart() {
+    const response = await fetch("/balance")
+    const result = await response.json()
+
+    ctx = document.getElementById("balance_chart")
+    color = "green"
+    let chart = createLineGraph(ctx, result.labels, result.values, color, "This month's balance")
+    console.log("3rd", chart)
+    return chart
+}
+
+
+function createPieGraph(element, labels, values, color, title) {
+    let data = {
+        labels: labels,
+        datasets: [{
+            data: values
+        }]
+    }
+
+    console.log("data", values)
+
+    return new Chart(
+        element, {
+        type: "pie",
+        data: data,
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: title
+                }
+            }
+        }
+    })
+    
+}
+
+async function createCategoriesChart(type) {
+    const response = await fetch(`/categories?type=${type}`)
+    const result = await response.json()
+
+    ctx = document.getElementById("categories_chart")
+    color = "green"
+    let chart = createPieGraph(ctx, result.labels, result.values, color, "Spending Categories")
+    console.log("4rd", chart)
+    return chart
 }
 
 if (window.location.pathname == "/analysis") {
     displayCharts()
+}
+
+if (window.location.pathname == "/dashboard") {
+    chart = createBalanceChart()
 }

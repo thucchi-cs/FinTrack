@@ -323,3 +323,51 @@ def get_transac_analysis_data():
         values.append(sum(data))
         
     return jsonify({"labels":labels, "values": values})
+
+
+# Get user's balance over the month for charts
+@app.route("/balance")
+def get_balance():
+    today = date.today()
+    labels = []
+    values = []
+    current_balance = db.table("balances").select("current_balance").eq("user_id", session.get("user_id")).execute().data[0]["current_balance"]
+    print(current_balance)
+    for i in range(today.day, 0, -1):
+        current_date = date(today.year, today.month, i)
+        today_amount = db.table("transactions").select("amount").eq("user_id", session.get("user_id")).eq("date_transacted", current_date).eq("deleted", False).execute().data
+        if len(today_amount) == 0:
+            today_amount = 0
+        else:
+            today_amount = [j["amount"] for j in today_amount]
+            today_amount = sum(today_amount)
+        current_balance -= today_amount
+        labels.insert(0, i)
+        values.insert(0, current_balance)
+    
+    for i in range(today.day+1, monthrange(today.year, today.month)[1] + 1):
+        labels.append(i)
+        values.append(None)
+    
+    return jsonify({"labels":labels, "values": values})
+
+# Get the user's categories
+@app.route("/categories")
+def get_categories():
+    today = date.today()
+    start = date(today.year, today.month, 1)
+    end = date(today.year, today.month, monthrange(today.year, today.month)[1])
+    
+    categories = db.table("transactions").select("category", "abs_amount").eq("user_id", session.get("user_id")).eq("deleted", False).lt("amount", 0).gte("date_transacted", start).lte("date_transacted", end).execute().data
+    values = {}
+    
+    sort_type = request.args.get("type", "spending")
+    for i in categories:
+        count = values.get(str(i["category"]), 0)
+        if sort_type == "frequency":
+            count += 1
+        elif sort_type == "spending":
+            count += i["abs_amount"]
+        values[str(i["category"])] = count
+    
+    return jsonify({"labels": list(values.keys()), "values": list(values.values())})

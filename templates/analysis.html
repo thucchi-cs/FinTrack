@@ -14,5 +14,17 @@
         </select>
     </form>
     
-    <canvas id="analysis_chart"></chart>
+    <div>
+        <canvas id="analysis_chart"></canvas>
+    </div>
+
+    <form id="categories_options">
+        <select name="type" id="categories_sort_type">
+            <option value="frequency">Most Frequent</option>
+            <option value="spending">Highest Spending</option>
+        </select>
+    </form>
+    <div>
+        <canvas id="categories_chart"></canvas>
+    </div>
 {% endblock %}
