@@ -3,6 +3,16 @@
 {% block body %}
     charts
     hello
-    <canvas id="income_chart"></chart>
-
+    <form id="analysis_options">
+        <select name="period" id="time_period_analysis">
+            <option value="weeks">weeks</option>
+            <option value="months">months</option>
+        </select>
+        <select name="type" id="transaction_type_analysis">
+            <option value="income">income</option>
+            <option value="expenses">expenses</option>
+        </select>
+    </form>
+    
+    <canvas id="analysis_chart"></chart>
 {% endblock %}

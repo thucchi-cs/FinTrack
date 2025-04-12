@@ -78,23 +78,43 @@ if (window.location.pathname == "/transactions") {
 }
 
 function createBarGraph(element, labels, values, colors, title) {
+    let avg = values.reduce((a, b) => a + b, 0)
+    avg /= values.length
+    avgData = Array(values.length).fill(avg)
     let data = {
         labels: labels,
         datasets: [{
             data: values,
-            backgroundColor: colors
+            backgroundColor: colors,
+            order: 2
+        }, 
+        {
+            data: avgData,
+            type: "line",
+            borderColor: "green",
+            borderDash: [20,10],
+            pointRadius: 0,
+            pointHitRadius: 100,
+            segment: {
+                hitRadius: 100
+            },
+            tension: 0,
+            label: "avg",
+            order: 1
         }]
     }
-    
-    new Chart(
+
+
+    return new Chart(
         element, {
         type: "bar",
         data: data,
-        options: {
+        options: {   
             responsive: true,
             plugins: {
                 legend: {
                     display: true,
+                    position: "top",
                     labels: {
                         generateLabels: (chart) => {
                           // Manually map each color to a label
@@ -111,17 +131,33 @@ function createBarGraph(element, labels, values, colors, title) {
                     display: true,
                     text: title
                 }
+            },
+            scales: {
+                x: {
+                    ticks: {
+                        padding: 0
+                    },
+                    grid: {
+                        offset: true
+                    },
+                    beginAtZero: true
+                },
+                y: {
+                    beginAtZero: true
+                }
             }
         }
     })
     
 }
 
-function createIncomeChart(period) {
-    fetch(`/income?periods=${period}`)
+function createAnalysisChart(period, type) {
+    let chart;
+    fetch(`/get_chart_data?periods=${period}&type=${type}`)
         .then(response => response.json())
         .then(result => {
-            ctx = document.getElementById("income_chart")
+            ctx = document.getElementById("income_chart_weeks")
+            // ctx = document.getElementById(type+"_chart_"+period)
             colors = [
                 "rbg(0,255,255)",
                 "rbg(0,255,255)",
@@ -130,12 +166,55 @@ function createIncomeChart(period) {
                 "rbg(0,255,0)",
                 "rbg(0,255,0)"
             ]
-            console.log(result)
-            createBarGraph(ctx, result.labels, result.values, colors, "Income over 6 weeks")
+            return createBarGraph(ctx, result.labels, result.values, colors, type+" over 6 " +period)
         })
+    console.log(chart)
+    return chart
+}
+
+async function createAnalysisCharts(period, type) {
+    const response = await fetch(`/get_chart_data?periods=${period}&type=${type}`)
+    const result = await response.json()
+
+    ctx = document.getElementById("analysis_chart")
+    // ctx = document.getElementById(type+"_chart_"+period)
+    colors = [
+        "rbg(0,255,255)",
+        "rbg(0,255,255)",
+        "rbg(0,255,255)",
+        "rbg(0,255,0)",
+        "rbg(0,255,0)",
+        "rbg(0,255,0)"
+    ]
+    let chart = createBarGraph(ctx, result.labels, result.values, colors, type+" over 6 " +period)
+    console.log("2nd", result)
+    return chart
+}
+
+async function displayCharts() {
+    let chart = await createAnalysisCharts("weeks", "income")
+    console.log("hi", chart)
+    options = document.getElementById("analysis_options")
+    let period = "weeks"
+    let transac_type = "income"
+    options.querySelector("#time_period_analysis").addEventListener("change", async () => {
+        timePeriods = options.querySelector("#time_period_analysis").value
+        console.log(timePeriods)
+        period = timePeriods
+        chart.destroy()
+        chart = await createAnalysisCharts(period, transac_type)
+    })
+    
+    options.querySelector("#transaction_type_analysis").addEventListener("change", async () => {
+        type = options.querySelector("#transaction_type_analysis").value
+        console.log(type)
+        transac_type = type
+        chart.destroy()
+        chart = await createAnalysisCharts(period, transac_type)
+    })
+    console.log("done?")
 }
 
 if (window.location.pathname == "/analysis") {
-    createIncomeChart("month")
-    console.log("done?")
+    displayCharts()
 }

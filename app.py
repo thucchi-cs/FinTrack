@@ -260,9 +260,9 @@ def update_session():
     session[data.get("key")] = data.get("value")
     return 'Session updated'
 
-# Get user's income data for chart analysis
-@app.route("/income")
-def get_income_data():
+# Get user's data for chart analysis
+@app.route("/get_chart_data")
+def get_transac_analysis_data():
     today = date.today()
     week = True if request.args.get("periods", "weeks") == "weeks" else False
     if week:
@@ -312,7 +312,12 @@ def get_income_data():
     labels = [label + str(i) for i in range(len(date_ranges))] 
     values = []      
     for r in date_ranges:
-        response = db.table("transactions").select("abs_amount").eq("user_id", session["user_id"]).gt("amount", 0).gte("date_transacted", r["begin"]).lte("date_transacted", r["end"]).execute()
+        transac_type = request.args.get("type", "income")
+        print(transac_type,week)
+        if transac_type == "income":
+            response = db.table("transactions").select("abs_amount").eq("user_id", session.get("user_id")).eq("deleted", False).gt("amount", 0).gte("date_transacted", r.get("begin")).lte("date_transacted", r.get("end")).execute()
+        else:
+            response = db.table("transactions").select("abs_amount").eq("user_id", session.get("user_id")).eq("deleted", False).lt("amount", 0).gte("date_transacted", r.get("begin")).lte("date_transacted", r.get("end")).execute()
         data = response.data
         data = [i["abs_amount"] for i in data]
         values.append(sum(data))
