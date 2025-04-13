@@ -135,12 +135,9 @@ function createBarGraph(element, labels, values, colors, title) {
             borderDash: [20,10],
             pointRadius: 0,
             pointHitRadius: 100,
-            // segment: {
-            //     hitRadius: 100
-            // },
             tension: 0,
             label: "avg",
-            order: 1
+            order: 1,
         }
         ]
     }
@@ -160,6 +157,14 @@ function createBarGraph(element, labels, values, colors, title) {
                 title: {
                     display: false,
                     text: title
+                },
+                tooltip: {
+                    callbacks: {
+                        label: (context) => {
+                            const value = context.parsed.y;
+                            return `$${value.toFixed(2)}`
+                        }
+                    }
                 }
             },
             scales: {
@@ -200,35 +205,6 @@ async function displayCharts() {
     await createAnalysisCharts("months", "income")
     await createCategoriesChart("frequency")
     await createCategoriesChart("spending")
-    // let analysisChart = await createAnalysisCharts("weeks", "expenses")
-    // let categories_chart = await createCategoriesChart("frequency")
-
-    // options = document.getElementById("analysis_options")
-    // let period = "weeks"
-    // let transac_type = "expenses"
-    // options.querySelector("#time_period_analysis").addEventListener("change", async () => {
-    //     timePeriods = options.querySelector("#time_period_analysis").value
-    //     console.log(timePeriods)
-    //     period = timePeriods
-    //     analysisChart.destroy()
-    //     analysisChart = await createAnalysisCharts(period, transac_type)
-    // })
-    
-    // options.querySelector("#transaction_type_analysis").addEventListener("change", async () => {
-    //     type = options.querySelector("#transaction_type_analysis").value
-    //     console.log(type)
-    //     transac_type = type
-    //     analysisChart.destroy()
-    //     analysisChart = await createAnalysisCharts(period, transac_type)
-    // })
-
-    // sortOptions = document.getElementById("categories_options")
-    // let sort = "frequency"
-    // sortOptions.querySelector("#categories_sort_type").addEventListener("change", async () => {
-    //     sort = sortOptions.querySelector("#categories_sort_type").value
-    //     categories_chart.destroy()
-    //     categories_chart = await createCategoriesChart(sort)
-    // })
 }
 
 function createLineGraph(element, labels, values, color, title) {
@@ -258,7 +234,13 @@ function createLineGraph(element, labels, values, color, title) {
                 tooltip: {
                     mode: 'nearest',   // can also try 'index' if you want crosshair behavior
                     intersect: false,  // makes the tooltip follow cursor along the line
-                  },
+                    callbacks: {
+                        label: (context) => {
+                            const value = context.parsed.y;
+                            return `$${value.toFixed(2)}`
+                        }
+                    }
+                },
                 legend: {
                     display: false,
                     position: "top"
@@ -290,7 +272,7 @@ async function createBalanceChart() {
 }
 
 
-function createPieGraph(element, labels, values, color, title) {
+function createPieGraph(element, labels, values, type, title) {
     let data = {
         labels: labels,
         datasets: [{
@@ -310,6 +292,17 @@ function createPieGraph(element, labels, values, color, title) {
                 title: {
                     display: false,
                     text: title
+                },
+                tooltip: {
+                    callbacks: {
+                        label: (context) => {
+                            const value = context.parsed;
+                            if (type == "frequency") {
+                                return `${value} transactions`
+                            }
+                            return `$${value.toFixed(2)}`
+                        }
+                    }
                 }
             }
         }
@@ -323,7 +316,7 @@ async function createCategoriesChart(type) {
 
     ctx = document.getElementById("categories_chart_"+type)
     color = "green"
-    let chart = createPieGraph(ctx, result.labels, result.values, color, "Spending Categories")
+    let chart = createPieGraph(ctx, result.labels, result.values, type, "Spending Categories")
     console.log("4rd", chart)
     return chart
 }

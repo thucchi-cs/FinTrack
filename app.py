@@ -279,6 +279,7 @@ def update_session():
 def get_transac_analysis_data():
     today = date.today()
     week = True if request.args.get("periods", "weeks") == "weeks" else False
+    labels = []
     if week:
         label = "week "
         days_difference = (today.weekday() + 1) % 7
@@ -288,6 +289,8 @@ def get_transac_analysis_data():
             "begin": begin,
             "end": end
         }]
+        week_label = begin.strftime("%m/%d") + " - " + end.strftime("%m/%d")
+        labels.append(week_label)
         for i in range(5):
             begin -= timedelta(days=7)
             end = begin + timedelta(days=6)
@@ -295,6 +298,8 @@ def get_transac_analysis_data():
                 "begin": begin,
                 "end": end
             })
+            week_label = begin.strftime("%m/%d") + " - " + end.strftime("%m/%d")
+            labels.insert(0, week_label)
         
         for i in date_ranges:
             print(i)
@@ -310,6 +315,8 @@ def get_transac_analysis_data():
             "begin": begin,
             "end": end
         }]
+        month_label = begin.strftime("%B")
+        labels.append(month_label)
         for i in range(5):
             month -= 1
             if month < 1:
@@ -322,8 +329,9 @@ def get_transac_analysis_data():
                 "begin": begin,
                 "end": end
             })
+            month_label = begin.strftime("%B")
+            labels.insert(0, month_label)
     
-    labels = [label + str(i) for i in range(len(date_ranges))] 
     values = []      
     for r in date_ranges:
         transac_type = request.args.get("type", "income")
@@ -377,11 +385,11 @@ def get_categories():
     
     sort_type = request.args.get("type", "spending")
     for i in categories:
-        count = values.get(str(i["categories"]["category"]), 0)
+        count = values.get(str(i["categories"]["category"]).capitalize(), 0)
         if sort_type == "frequency":
             count += 1
         elif sort_type == "spending":
             count += i["abs_amount"]
-        values[str(i["categories"]["category"])] = count
+        values[str(i["categories"]["category"]).capitalize()] = count
     
     return jsonify({"labels": list(values.keys()), "values": list(values.values())})
