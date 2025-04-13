@@ -3,6 +3,7 @@
 {% block body %}
 
     <div class="register-container">
+        <!-- Image and branding texts on the left -->
         <div class="register-left">
             <div class="branding-texts">
                 <h1>FinTrack</h1>
@@ -10,9 +11,12 @@
             </div>
         </div>
     
+        <!-- Registration card on the right -->
         <div class="register-right">
             <div class="register-card">
                 <h2>Register</h2>
+
+                <!-- Fill out fields -->
                 <form action="/register" method="POST">
                     <input type="text" autofocus autocomplete="off" name="username" placeholder="Username">
                     <input type="password" autocomplete="off" name="password" placeholder="Password">
@@ -32,11 +36,11 @@
                             <label for="student_check">I am a student</label>
                         </span>
                     </div>
-                    
             
                     <button type="submit">Register</button>
                 </form>
         
+                <!-- Option to log in -->
                 <p class="login-text">
                 Already have an account? <a href="/login">Login</a>
                 </p>

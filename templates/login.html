@@ -3,15 +3,18 @@
 {% block body %}
 
     <div class="login-container">
-        <!-- Left: Login Form -->
+        <!-- Login Form on the left -->
         <div class="login-left">
             <div class="login-card">
                 <h2>Log In</h2>
+
+                <!-- Fill out forms -->
                 <form action="/login" method="post">
                     <input type="text" autofocus autocomplete="off" name="username" placeholder="Username">
                     <input type="password" autocomplete="off" name="password" placeholder="Password">
                     <button type="submit">Log In</button>
-
+                    
+                    <!-- Option to register -->
                     <p class="register-text">
                         Don't have an account?
                         <a href="/register">Register</a>
@@ -20,7 +23,7 @@
             </div>
         </div>
     
-        <!-- Right: Branding -->
+        <!-- Image and Branding on the right -->
         <div class="login-right">
             <div class="branding">
                 <h1>FinTrack</h1>

@@ -1,5 +1,5 @@
 from datetime import date
-from flask import redirect, render_template, session, flash
+from flask import redirect, session, flash
 from functools import wraps
 from werkzeug.security import check_password_hash
 import datetime
@@ -25,12 +25,6 @@ def get_today():
 
 # Check if currently logged in
 def login_required(f):
-    """
-    Decorate routes to require login.
-
-    https://flask.palletsprojects.com/en/latest/patterns/viewdecorators/
-    """
-
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if session.get("user_id") is None:

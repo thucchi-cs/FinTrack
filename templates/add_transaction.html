@@ -4,9 +4,11 @@
 
     <div class="add-transaction-page">
     {% if add %}
+            <!-- ADD transaction -->
             <div class="add-transaction-card">
                 <h2 class="card-title">Add Transaction</h2>
                 
+                <!-- Fill out form -->
                 <form action="/add_transaction" method="post" class="transaction-form" id="add_transaction">
                     <input type="number" step="0.01" autocomplete="off" name="amount" placeholder="Amount ($)" id="add_transac_amount">
                     
@@ -30,9 +32,11 @@
             </div>
       
     {% elif edit %}
+        <!-- EDIT transaction -->
         <div class="add-transaction-card">
             <h2 class="card-title">Edit Transaction</h2>
             
+            <!-- Fill out form -->
             <form action="/edited_transaction" method="post" class="transaction-form" id="add_transaction">
                 <input type="number" step="0.01" autocomplete="off" name="amount" placeholder="Amount ($)" id="add_transac_amount" value={{info["amount"]|abs}}>
                 
