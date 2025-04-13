@@ -1,30 +1,45 @@
 {% extends "layout.html" %}
 
 {% block body %}
-    charts
-    hello
-    <form id="analysis_options">
-        <select name="period" id="time_period_analysis">
-            <option value="weeks">weeks</option>
-            <option value="months">months</option>
-        </select>
-        <select name="type" id="transaction_type_analysis">
-            <option value="income">income</option>
-            <option value="expenses">expenses</option>
-        </select>
-    </form>
-    
-    <div>
-        <canvas id="analysis_chart"></canvas>
+    <div class="analysis-tab">
+        <!-- SECTION 1: Expenses -->
+        <div class="chart-section">
+            <div class="chart-tabs">
+                <button class="tab-btn active" onclick="switchTab(this, 'expenses', 'weeks')">6 Weeks</button>
+                <button class="tab-btn" onclick="switchTab(this, 'expenses', 'months')">6 Months</button>
+            </div>
+            <div class="chart-header">
+                <h2>Expenses Overview</h2>
+            </div>
+            <canvas id="expenses_chart_weeks" class="chart-canvas"></canvas>
+            <canvas id="expenses_chart_months" class="chart-canvas hidden"></canvas>
+        </div>
+      
+        <!-- SECTION 2: Income -->
+        <div class="chart-section">
+            <div class="chart-tabs">
+                <button class="tab-btn active" onclick="switchTab(this, 'income', 'weeks')">6 Weeks</button>
+                <button class="tab-btn" onclick="switchTab(this, 'income', 'months')">6 Months</button>
+            </div>
+            <div class="chart-header">
+                <h2>Income Overview</h2>
+            </div>
+            <canvas id="income_chart_weeks" class="chart-canvas"></canvas>
+            <canvas id="income_chart_months" class="chart-canvas hidden"></canvas>
+        </div>
+      
+        <!-- SECTION 3: Spending Categories -->
+        <div class="chart-section">
+            <div class="chart-tabs">
+                <button class="tab-btn active" onclick="switchTab(this, 'categories', 'frequency')">Most Frequent</button>
+                <button class="tab-btn" onclick="switchTab(this, 'categories', 'spending')">Highest Spending</button>
+            </div>
+            <div class="chart-header">
+                <h2>Spending Categories This Month</h2>
+            </div>
+            <canvas id="categories_chart_frequency" class="chart-canvas categories"></canvas>
+            <canvas id="categories_chart_spending" class="chart-canvas hidden categories"></canvas>
+        </div>
     </div>
-
-    <form id="categories_options">
-        <select name="type" id="categories_sort_type">
-            <option value="frequency">Most Frequent</option>
-            <option value="spending">Highest Spending</option>
-        </select>
-    </form>
-    <div>
-        <canvas id="categories_chart"></canvas>
-    </div>
+      
 {% endblock %}

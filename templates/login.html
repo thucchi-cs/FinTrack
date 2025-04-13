@@ -2,10 +2,37 @@
 
 {% block body %}
 
+    <div class="login-container">
+        <!-- Left: Login Form -->
+        <div class="login-left">
+            <div class="login-card">
+                <h2>Log In</h2>
+                <form action="/login" method="post">
+                    <input type="text" autofocus autocomplete="off" name="username" placeholder="Username">
+                    <input type="password" autocomplete="off" name="password" placeholder="Password">
+                    <button type="submit">Log In</button>
+
+                    <p class="register-text">
+                        Don't have an account?
+                        <a href="/register">Register</a>
+                    </p>
+                </form>
+            </div>
+        </div>
+    
+        <!-- Right: Branding -->
+        <div class="login-right">
+            <div class="branding">
+                <h1>FinTrack</h1>
+                <p>Stay on top of your finances with a clean and simple tool made for students.</p>
+            </div>
+        </div>
+    </div>
+
     hi
     <form action="/login" method="post">
         <input type="text" autofocus autocomplete="off" name="username" placeholder="Username">
-        <input type="text" autocomplete="off" name="password" placeholder="Password">
+        <input type="password" autocomplete="off" name="password" placeholder="Password">
         <button type="submit">Login</button>
     </form>
 

@@ -2,13 +2,18 @@ from datetime import date
 from flask import redirect, render_template, session, flash
 from functools import wraps
 from werkzeug.security import check_password_hash
-
+import datetime
 
 # Format money
 def format_usd(num):
     if ((type(num) != int) and (type(num) != float)):
         return num
     return f'$%0.2f' % float(num)
+
+# Format date
+def format_date(date):
+    date = datetime.datetime.strptime(date, "%Y-%m-%d")
+    return f"{date.strftime("%B")[:3]} {date.day}, {date.year}"
 
 # Get absolute value of number
 def absolute(num):
@@ -35,7 +40,7 @@ def login_required(f):
     return decorated_function
 
 # Check if input for registration is valid
-def check_valid_registration(db, username, password, password2):
+def check_valid_registration(db, username, password, password2, balance):
     # Get list of existing usernames
     usernames = list(db.table("users").select("username").execute())[0][1]
     usernames = [user["username"] for user in usernames]
@@ -85,6 +90,11 @@ def check_valid_registration(db, username, password, password2):
         flash("Password was not confirmed!")
         return False
     
+    # Check for valid starting balance
+    if balance < 0:
+        flash("Invalid starting balance!")
+        return False
+    
     # All fields pass
     return True
 
@@ -109,9 +119,15 @@ def check_valid_login(db, username, password):
 
 # Log in user
 def set_session_user(db, username):
-    user_id = list(db.table("users").select("id").eq("username", username).execute())[0][1][0]['id']
-    session['user_id'] = user_id
+    user = db.table("users").select("id", "student").eq("username", username).execute().data[0]
+    session['user_id'] = user["id"]
     session['username'] = username
+    session['student'] = user["student"]
+    if session['student']:
+        categories = db.table("categories").select("*").execute().data
+    else:
+        categories = db.table("categories").select("*").eq("student", False).execute().data
+    session["categories"] = categories
     
 # Get user's balance from database
 def get_user_balance(db, user_id):

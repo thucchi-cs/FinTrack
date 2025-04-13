@@ -12,6 +12,7 @@ app = Flask(__name__)
 
 app.jinja_env.filters["usd"] = format_usd
 app.jinja_env.filters["abs"] = absolute
+app.jinja_env.filters["date"] = format_date
 app.jinja_env.globals["today"] = get_today
 # app.jinja_env.
 
@@ -29,7 +30,7 @@ db: Client = create_client(db_url, db_key)
 # Website homepage
 @app.route("/", methods=["POST", "GET"])
 def index():
-    return render_template("index.html")
+    return redirect("/login")
 
 # User's dashboard
 @app.route("/dashboard")
@@ -39,8 +40,18 @@ def dashboard():
     user = list(db.table("users").select("*").eq("id", session.get("user_id")).execute())[0][1][0]
     balance = get_user_balance(db, session.get("user_id"))
     
+    today = date.today()
+    start = date(today.year, today.month, 1)
+    end = date(today.year, today.month, monthrange(today.year, today.month)[1])
+    income = db.table("transactions").select("abs_amount").eq("user_id", session.get("user_id")).eq("deleted", False).gt("amount", 0).gte("date_transacted", start).lte("date_transacted", end).execute().data
+    income = [i["abs_amount"] for i in income]
+    expenses = db.table("transactions").select("abs_amount").eq("user_id", session.get("user_id")).eq("deleted", False).lt("amount", 0).gte("date_transacted", start).lte("date_transacted", end).execute().data
+    expenses = [i["abs_amount"] for i in expenses]
+    income = sum(income)
+    expenses = sum(expenses)
+    
     # Go to user's dashboard
-    return render_template("dashboard.html", username=user["username"], date_joined=user["date_joined"], balance=balance)
+    return render_template("dashboard.html", username=user["username"], date_joined=user["date_joined"], balance=balance, income=income, expenses=expenses, page="dashboard")
 
 # Login page
 @app.route("/login", methods=["POST", "GET"])
@@ -72,20 +83,22 @@ def register():
         username = request.form.get("username")
         password = request.form.get("password")
         password2 = request.form.get("password2")
+        student = request.form.get("student")
+        balance = float(request.form.get("balance"))
         
         # Check for input validity
-        if check_valid_registration(db, username, password, password2):
+        if check_valid_registration(db, username, password, password2, balance):
             # Hash password for security
             hashed_password = generate_password_hash(password)
         
             # Add user to database
-            db.table("users").insert({"username": username, "password_hash": hashed_password}).execute()
+            db.table("users").insert({"username": username, "password_hash": hashed_password, "student": student}).execute()
             
             # Login user to the current session
             set_session_user(db, username)
             
             # Initialize user with $0
-            db.table("balances").insert({"user_id": session["user_id"], "current_balance": 0}).execute()
+            db.table("balances").insert({"user_id": session["user_id"], "current_balance": balance}).execute()
             
             # Direct user to dashboard
             return redirect("/dashboard")
@@ -107,7 +120,7 @@ def logout():
 @app.route("/analysis")
 @login_required
 def analysis():
-    return render_template("analysis.html")
+    return render_template("analysis.html", page="analysis")
 
 # Transactions page
 @app.route("/transactions", methods=["POST", "GET"])
@@ -123,14 +136,13 @@ def transactions():
     if request.method == "POST":
         sort_by = request.form.get("sort")
         desc = request.form.get("reverse")
+        desc = False if desc == "False" else True
+        print(desc, sort_by)
     desc = not desc
-    print(desc)
-    user_transactions = list(db.table("transactions").select("*").eq("user_id", session['user_id']).order(sort_by, desc=desc).execute())[0][1]
-    smth = list(db.table("transactions").select("*").eq("user_id", session['user_id']).gte("abs_amount", 30).lte("abs_amount", 60).execute())[0][1]
-    print(smth)
+    user_transactions = db.table("transactions").select("*, categories(category)").eq("user_id", session['user_id']).order(sort_by, desc=desc).execute().data
     has_transactions = len(user_transactions) > 0
 
-    return render_template("transactions.html", transactions=user_transactions, has_transactions=has_transactions, sort=sort_by, order_keys=orders.keys(), orders=orders, desc=not desc)
+    return render_template("transactions.html", transactions=user_transactions, has_transactions=has_transactions, sort=sort_by, order_keys=orders.keys(), orders=orders, desc=not desc, page="transactions")
 
 # Add a transaction
 @app.route("/add_transaction", methods=["POST", "GET"])
@@ -147,23 +159,25 @@ def add_transaction():
         date_transacted = request.form.get("date")
         category = request.form.get("category")
         type = request.form.get("type")
+        print(type)
+        category = 14 if (category == None) or (type == "income") else category
         amount *= -1 if type == "expense" else 1
         today = date.today()
 
-        try:
+        # try:
             # Add transaction to database table 'transactions'
-            data = {
-                "user_id": session.get("user_id"), 
-                "amount": amount, 
-                "abs_amount": abs(amount),
-                "date_transacted": date_transacted, 
-                "date_added": str(today), 
-                "category": category
-            }
-            db.table("transactions").insert(data).execute()
-        except:
-            flash("Invalid input!")
-            return redirect("/add_transaction")
+        data = {
+            "user_id": session.get("user_id"), 
+            "amount": amount, 
+            "abs_amount": abs(amount),
+            "date_transacted": date_transacted, 
+            "date_added": str(today), 
+            "category_id": category
+        }
+        db.table("transactions").insert(data).execute()
+        # except:
+        #     flash("Invalid input!")
+        #     return redirect("/add_transaction")
         
         # Update user's current balance
         current_balance = get_user_balance(db, session.get("user_id"))
@@ -171,7 +185,7 @@ def add_transaction():
         
         return redirect("/transactions")
     
-    return render_template("add_transaction.html", add=True, edit=False)
+    return render_template("add_transaction.html", add=True, edit=False, categories=session["categories"])
 
 # Edit a transaction page
 @app.route("/edit_transaction", methods=["POST"])
@@ -179,7 +193,7 @@ def add_transaction():
 def edit_transaction():
     transaction_info = list(db.table("transactions").select("*").eq("transaction_id", request.form.get("id")).execute())[0][1][0]
     print(transaction_info)
-    return render_template("add_transaction.html", add=False, edit=True, info=transaction_info)
+    return render_template("add_transaction.html", add=False, edit=True, info=transaction_info, categories=session["categories"])
 
 # Edit transaction
 @app.route("/edited_transaction", methods=["POST"])
@@ -194,24 +208,22 @@ def edited_transaction():
     date_transacted = request.form.get("date")
     category = request.form.get("category")
     type = request.form.get("type")
+    print(type)
+    category = 14 if (category == None) or (type == "income") else category
     amount *= -1 if type == "expense" else 1
     id = request.form.get("id")
 
     # Find updated difference 
     difference = amount - list(db.table("transactions").select("*").eq("transaction_id", request.form.get("id")).execute())[0][1][0]["amount"]
     
-    try:
-        # Add transaction to database table 'transactions'
-        data = {
-            "amount": amount,
-            "abs_amount": abs(amount),
-            "date_transacted": date_transacted,
-            "category": category
-        }
-        db.table("transactions").update(data).eq("transaction_id", id).execute()
-    except:
-        flash("Invalid input!")
-        return redirect("/transactions")
+    # Add transaction to database table 'transactions'
+    data = {
+        "amount": amount,
+        "abs_amount": abs(amount),
+        "date_transacted": date_transacted,
+        "category_id": category
+    }
+    db.table("transactions").update(data).eq("transaction_id", id).execute()
     
     # Update user's current balance
     current_balance = get_user_balance(db, session.get("user_id"))
@@ -324,7 +336,6 @@ def get_transac_analysis_data():
         
     return jsonify({"labels":labels, "values": values})
 
-
 # Get user's balance over the month for charts
 @app.route("/balance")
 def get_balance():
@@ -345,9 +356,9 @@ def get_balance():
         labels.insert(0, i)
         values.insert(0, current_balance)
     
-    for i in range(today.day+1, monthrange(today.year, today.month)[1] + 1):
-        labels.append(i)
-        values.append(None)
+    # for i in range(today.day+1, monthrange(today.year, today.month)[1] + 1):
+    #     labels.append(i)
+    #     values.append(None)
     
     return jsonify({"labels":labels, "values": values})
 
@@ -358,16 +369,17 @@ def get_categories():
     start = date(today.year, today.month, 1)
     end = date(today.year, today.month, monthrange(today.year, today.month)[1])
     
-    categories = db.table("transactions").select("category", "abs_amount").eq("user_id", session.get("user_id")).eq("deleted", False).lt("amount", 0).gte("date_transacted", start).lte("date_transacted", end).execute().data
+    categories = db.table("transactions").select("categories(category)", "abs_amount").eq("user_id", session.get("user_id")).eq("deleted", False).lt("amount", 0).gte("date_transacted", start).lte("date_transacted", end).execute().data
+    print(categories)
     values = {}
     
     sort_type = request.args.get("type", "spending")
     for i in categories:
-        count = values.get(str(i["category"]), 0)
+        count = values.get(str(i["categories"]["category"]), 0)
         if sort_type == "frequency":
             count += 1
         elif sort_type == "spending":
             count += i["abs_amount"]
-        values[str(i["category"])] = count
+        values[str(i["categories"]["category"])] = count
     
     return jsonify({"labels": list(values.keys()), "values": list(values.values())})

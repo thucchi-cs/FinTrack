@@ -1,11 +1,18 @@
 {% extends "layout.html" %}
 
 {% block body %}
-    home
-    hello
-    {{username}}
-    {{date_joined}}
-    {{balance|usd}}
-    <canvas id="balance_chart"></chart>
+    <div class="chart-card">
+        <div class="balance-info">
+            <div class="current-balance">Current Balance: {{balance|usd}}</div>
+        </div>
+        <h2 class="chart-title">Balance Over Time – April 2025</h2>
+        <div class="month-summary">Income: {{income|usd}} | Expenses: {{expenses|usd}}</div>
+        <canvas id="balance_chart"></canvas>
+
+        <a href="/analysis" class="card-footer-link">
+            See more details of your income and expenses
+            <span class="arrow">→</span>
+        </a>
+    </div>      
 
 {% endblock %}

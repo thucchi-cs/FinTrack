@@ -41,8 +41,8 @@ if ((window.location.pathname == "/add_transaction") || (window.location.pathnam
         let type = addTransaction.querySelector("#add_transac_type").value;
         let category = addTransaction.querySelector("#add_transac_category").value;
         let date = addTransaction.querySelector("#add_transac_date").value;
-        
-        if (!amount || !type || !date) {
+
+        if (!amount || type == "Type" || !date) {
             flashMsg("All required fields must be filled out!");
             return;
         }
@@ -62,6 +62,16 @@ if ((window.location.pathname == "/add_transaction") || (window.location.pathnam
 
         addTransaction.submit()
     })
+
+    transac_type = document.querySelector("#add_transac_type")
+    transac_type.addEventListener("change", () => {
+        value = transac_type.value
+        if (value == "expense") {
+            document.querySelector("#add_transac_category").hidden = false
+        } else {
+            document.querySelector("#add_transac_category").hidden = true
+        }
+    })
 }
 
 if (window.location.pathname == "/transactions") {
@@ -75,6 +85,33 @@ if (window.location.pathname == "/transactions") {
             confirmationNeeded[i].querySelector("#confirm_action").hidden = true;
         })
     }
+
+    let transactionToDelete = null;
+
+    function confirmDelete(transaction_id) {
+        const popup = document.getElementById('delete-popup');
+        popup.classList.remove('hidden');
+        transactionToDelete = transaction_id;
+    }
+
+    function closePopup() {
+        document.getElementById('delete-popup').classList.add('hidden');
+        transactionToDelete = null;
+    }
+
+    document.getElementById('confirm-delete').addEventListener('click', () => {
+        if (transactionToDelete) {
+            document.getElementById("delete-" + transactionToDelete).submit()
+        }
+        closePopup();
+    });
+
+    sortPanel = document.getElementById("sortOptionsPanel")
+    optionsBtn = document.getElementById("sortMenuToggle")
+    optionsBtn.addEventListener("click", () => {
+        sortPanel.classList.toggle("hidden")
+    })
+
 }
 
 function createBarGraph(element, labels, values, colors, title) {
@@ -121,7 +158,7 @@ function createBarGraph(element, labels, values, colors, title) {
                     position: "top"
                 },
                 title: {
-                    display: true,
+                    display: false,
                     text: title
                 }
             },
@@ -148,7 +185,7 @@ async function createAnalysisCharts(period, type) {
     const response = await fetch(`/get_chart_data?periods=${period}&type=${type}`)
     const result = await response.json()
 
-    ctx = document.getElementById("analysis_chart")
+    ctx = document.getElementById(type+"_chart_"+period)
     // ctx = document.getElementById(type+"_chart_"+period)
     colors = Array(result.values.length).fill("rgba(8, 145, 8, 0.59)")
     let chart = createBarGraph(ctx, result.labels, result.values, colors, type+" over 6 " +period)
@@ -157,35 +194,41 @@ async function createAnalysisCharts(period, type) {
 }
 
 async function displayCharts() {
-    let analysisChart = await createAnalysisCharts("weeks", "income")
-    let categories_chart = await createCategoriesChart("frequency")
+    await createAnalysisCharts("weeks", "expenses")
+    await createAnalysisCharts("months", "expenses")
+    await createAnalysisCharts("weeks", "income")
+    await createAnalysisCharts("months", "income")
+    await createCategoriesChart("frequency")
+    await createCategoriesChart("spending")
+    // let analysisChart = await createAnalysisCharts("weeks", "expenses")
+    // let categories_chart = await createCategoriesChart("frequency")
 
-    options = document.getElementById("analysis_options")
-    let period = "weeks"
-    let transac_type = "income"
-    options.querySelector("#time_period_analysis").addEventListener("change", async () => {
-        timePeriods = options.querySelector("#time_period_analysis").value
-        console.log(timePeriods)
-        period = timePeriods
-        analysisChart.destroy()
-        analysisChart = await createAnalysisCharts(period, transac_type)
-    })
+    // options = document.getElementById("analysis_options")
+    // let period = "weeks"
+    // let transac_type = "expenses"
+    // options.querySelector("#time_period_analysis").addEventListener("change", async () => {
+    //     timePeriods = options.querySelector("#time_period_analysis").value
+    //     console.log(timePeriods)
+    //     period = timePeriods
+    //     analysisChart.destroy()
+    //     analysisChart = await createAnalysisCharts(period, transac_type)
+    // })
     
-    options.querySelector("#transaction_type_analysis").addEventListener("change", async () => {
-        type = options.querySelector("#transaction_type_analysis").value
-        console.log(type)
-        transac_type = type
-        analysisChart.destroy()
-        analysisChart = await createAnalysisCharts(period, transac_type)
-    })
+    // options.querySelector("#transaction_type_analysis").addEventListener("change", async () => {
+    //     type = options.querySelector("#transaction_type_analysis").value
+    //     console.log(type)
+    //     transac_type = type
+    //     analysisChart.destroy()
+    //     analysisChart = await createAnalysisCharts(period, transac_type)
+    // })
 
-    sortOptions = document.getElementById("categories_options")
-    let sort = "frequency"
-    sortOptions.querySelector("#categories_sort_type").addEventListener("change", async () => {
-        sort = sortOptions.querySelector("#categories_sort_type").value
-        categories_chart.destroy()
-        categories_chart = await createCategoriesChart(sort)
-    })
+    // sortOptions = document.getElementById("categories_options")
+    // let sort = "frequency"
+    // sortOptions.querySelector("#categories_sort_type").addEventListener("change", async () => {
+    //     sort = sortOptions.querySelector("#categories_sort_type").value
+    //     categories_chart.destroy()
+    //     categories_chart = await createCategoriesChart(sort)
+    // })
 }
 
 function createLineGraph(element, labels, values, color, title) {
@@ -221,23 +264,11 @@ function createLineGraph(element, labels, values, color, title) {
                     position: "top"
                 },
                 title: {
-                    display: true,
+                    display: false,
                     text: title
                 }
             },
             scales: {
-                x: {
-                    // type: "time",
-                    // time: {
-                    //     unit: "day"
-                    //     // tooltipFormat: "MMM d",
-                    //     // displayFormats: {
-                    //     //     day: "MMM d"
-                    //     // }
-                    // },
-                    min: 1,
-                    max: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate()
-                },
                 y: {
                     beginAtZero: false
                 }
@@ -277,7 +308,7 @@ function createPieGraph(element, labels, values, color, title) {
             responsive: true,
             plugins: {
                 title: {
-                    display: true,
+                    display: false,
                     text: title
                 }
             }
@@ -290,7 +321,7 @@ async function createCategoriesChart(type) {
     const response = await fetch(`/categories?type=${type}`)
     const result = await response.json()
 
-    ctx = document.getElementById("categories_chart")
+    ctx = document.getElementById("categories_chart_"+type)
     color = "green"
     let chart = createPieGraph(ctx, result.labels, result.values, color, "Spending Categories")
     console.log("4rd", chart)
@@ -304,3 +335,19 @@ if (window.location.pathname == "/analysis") {
 if (window.location.pathname == "/dashboard") {
     chart = createBalanceChart()
 }
+
+
+function switchTab(button, chart, period) {
+    // Update button styles
+    const parent = button.parentElement;
+    Array.from(parent.children).forEach(btn => btn.classList.remove('active'));
+    button.classList.add('active');
+  
+    // Hide all canvases in the group
+    const canvases = document.querySelectorAll(`canvas[id^="${chart}_"]`);
+    canvases.forEach(canvas => canvas.classList.add('hidden'));
+  
+    // Show selected chart
+    document.getElementById(`${chart}_chart_${period}`).classList.remove('hidden');
+}
+  
