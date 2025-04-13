@@ -30,6 +30,8 @@ db: Client = create_client(db_url, db_key)
 # Website homepage
 @app.route("/", methods=["POST", "GET"])
 def index():
+    if session.get("user_id"):
+        return redirect("/dashboard")
     return redirect("/login")
 
 # User's dashboard
