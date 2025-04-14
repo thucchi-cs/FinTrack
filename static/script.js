@@ -379,3 +379,20 @@ if (window.location.pathname == "/transactions") {
     })
 
 }
+
+// Show / hide password
+if (window.location.pathname == "/login" || window.location.pathname == "/register") {
+    showPassword = document.getElementById("show-password")
+    // When toggled
+    showPassword.addEventListener("click", () => {
+        passwords = document.querySelectorAll("#password_input")
+        for (let password of passwords) {
+            // change visibility
+            if (showPassword.checked) {
+                password.type = "text"
+            } else {
+                password.type = "password"
+            }
+        };
+    })
+}

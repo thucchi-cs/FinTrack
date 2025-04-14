@@ -170,7 +170,8 @@
 }
 
 .checkbox-container {
-  margin-bottom: 15px;
+  margin-bottom: 0px;
+  margin-top: 0px;
   text-align: left;
 }
 
@@ -258,6 +259,7 @@
     width: 80%;
     max-width: 500px;
     text-align: center;
+    max-height: 95%;
 }
 
 .register-card p {

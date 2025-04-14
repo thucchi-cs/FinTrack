@@ -19,8 +19,16 @@
                 <!-- Fill out fields -->
                 <form action="/register" method="POST">
                     <input type="text" autofocus autocomplete="off" name="username" placeholder="Username">
-                    <input type="password" autocomplete="off" name="password" placeholder="Password">
-                    <input type="password" autocomplete="off" name="password2" placeholder="Confirm Password">
+                    <input id="password_input" type="password" autocomplete="off" name="password" placeholder="Password">
+                    <input id="password_input" type="password" autocomplete="off" name="password2" placeholder="Confirm Password">
+                    <div class="checkbox-container">
+                        <span>
+                            <input type="checkbox" name="show-password" id="show-password">
+                        </span>
+                        <span>
+                            <label for="show-password">Show Password</label>
+                        </span>
+                    </div>
                     <p>Password must have:</p>
                     <p>• at least 8 characters</p>
                     <p>• an uppercase letter and a lowercase letter</p>
