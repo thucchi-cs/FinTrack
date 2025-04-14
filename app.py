@@ -138,20 +138,27 @@ def transactions():
     orders = {"date_transacted": "Date", "abs_amount": "Amount"}
     sort_by = "date_transacted"
     desc = False
+    filter_category = "All"
     
     # Get sorting values if needed
     if request.method == "POST":
         sort_by = request.form.get("sort")
         desc = request.form.get("reverse")
         desc = False if desc == "False" else True
+        filter_category = request.form.get("categories")
+        filter_category = 0 if filter_category == "All" else int(filter_category)
     
     # Query database for transactions
     desc = not desc
-    user_transactions = db.table("transactions").select("*, categories(category)").eq("user_id", session['user_id']).order(sort_by, desc=desc).execute().data
+    if filter_category == "All":
+        user_transactions = db.table("transactions").select("*, categories(category)").eq("user_id", session['user_id']).order(sort_by, desc=desc).execute().data
+    else:
+        user_transactions = db.table("transactions").select("*, categories(category)").eq("user_id", session['user_id']).eq("category_id", filter_category).order(sort_by, desc=desc).execute().data
+    
     has_transactions = len(user_transactions) > 0
 
     # Go to transactions page
-    return render_template("transactions.html", transactions=user_transactions, has_transactions=has_transactions, sort=sort_by, order_keys=orders.keys(), orders=orders, desc=not desc, page="transactions")
+    return render_template("transactions.html", transactions=user_transactions, has_transactions=has_transactions, sort=sort_by, order_keys=orders.keys(), orders=orders, desc=not desc, page="transactions", categories=session["categories"], filter_category=filter_category)
 
 # Add a transaction
 @app.route("/add_transaction", methods=["POST", "GET"])

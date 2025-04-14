@@ -34,6 +34,14 @@
                         <option value="True" {% if desc %} selected {% endif %}>Increasing</option>
                         <option value="False" {% if not desc %} selected {% endif %}>Decreasing</option>
                     </select>
+
+                    <label for="category-filter">Filter categories:</label>
+                    <select id="category-filter" name="categories">
+                        <option value="All" {% if "All"==filter_category %} selected {% endif %}>All Categories</option>
+                        {% for c in categories%}
+                            <option value={{c["category_id"]}} {% if c["category_id"]==filter_category %} selected {% endif %}>{{c["category"]}}</option>
+                        {% endfor %}
+                    </select>
                     <button id="applySortBtn" type="submit">Apply</button>
                 </form>
             </div>
