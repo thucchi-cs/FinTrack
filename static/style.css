@@ -1,3 +1,9 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
 .login-container {
     display: flex;
     height: 100vh;
@@ -176,14 +182,14 @@
 }
 
 .checkbox-container label {
-  font-size: 0.9rem;
+    font-size: 0.9rem;
   color: #555;
 }
 
 .login-text {
-  margin-top: 10px;
-  font-size: 0.9rem;
-  color: #555;
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: #555;
 }
 
 .login-text a {
@@ -321,7 +327,7 @@
     color: #555;
     text-align: center !important;
 }
-  
+
 .login-text a {
     color: #007bff;
     text-decoration: none;
@@ -332,6 +338,7 @@
     text-decoration: underline;
 }
   
+/* HERE NOW */
 /* General navbar style */
 .navbar {
     display: flex;
@@ -365,7 +372,7 @@
     padding-bottom: 4px;
     transition: color 0.3s ease;
 }
-  
+
 /* Active tab */
   .nav-link.active {
     color: #28a745; /* Green */
@@ -390,7 +397,7 @@
 .nav-link:hover {
     color: #28a745;
 }
-  
+
 /* Dropdown styles */
 .dropdown {
     position: relative;
@@ -436,7 +443,7 @@
 .dropdown-content a:hover {
     background-color: #28a745;
 }
-  
+
 .dropdown:hover .dropdown-content {
     display: block;
 }
@@ -459,7 +466,7 @@ canvas {
     width: 100% !important;
     height: auto !important;
 }
-  
+
 
 .balance-info {
     margin-bottom: 1rem;
@@ -544,7 +551,7 @@ canvas {
     font-size: 1.4rem;
     font-weight: 600;
 }
-  
+
 .chart-tabs {
     position: absolute;
     top: 0;
@@ -558,7 +565,7 @@ canvas {
     box-shadow: 0 2px 5px rgb(0, 0, 0, 0.5);
     z-index: 2;
 }
-  
+
 .tab-btn {
     border: none;
     background: #e0e0e0;
@@ -644,17 +651,17 @@ canvas {
     z-index: 1;
 }
   
-  
+
 .transaction-card .type {
     font-weight: 600;
     min-width: 70px;
     text-transform: capitalize;
 }
-  
+
 .transaction-card .type.income {
     color: green;
 }
-  
+
 .transaction-card .type.expense {
     color: crimson;
 }
@@ -682,7 +689,7 @@ canvas {
     font-size: 1.2rem;
     cursor: pointer;
 }
-  
+
   /* Popup Styles */
 .popup {
     position: fixed;
@@ -693,7 +700,7 @@ canvas {
     background: rgba(0,0,0,0.3);
     z-index: 999;
 }
-  
+
 .popup-content {
     background: white;
     padding: 2rem;
@@ -827,7 +834,7 @@ canvas {
 .add-transaction-btn:hover .plus-icon {
     margin-right: 0.5rem;
 }
-  
+
 .add-transaction-btn:hover .btn-label {
     opacity: 1;
     display: inline;
@@ -887,4 +894,149 @@ canvas {
 .msg {
     padding: 3rem;
     text-align: center;
+}
+
+@media (max-width: 1000px) {
+    .login-container {
+        flex-direction: column;
+        position: relative;
+    }
+    
+    .login-left {
+        width: 100%;
+        background: url('/static/pattern.jpg') center center / cover no-repeat;
+        position: absolute;
+        z-index: 1;
+    }
+    
+    .login-left::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.568); /* semi-transparent gray */
+        z-index: 0;
+    }
+    
+    .login-right {
+        width: 100%;
+        height: 50%;
+        position: absolute;
+        background: none;
+        overflow: visible;
+        z-index: 2;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .login-right::before {
+        display: none;
+    }
+    
+    /* Make sure the actual content stays above the overlay */
+    .branding {
+        position: relative;
+        z-index: 2;
+        width: 100%;
+    }
+    
+    .branding h1 {
+        margin-bottom: 50%;
+    }
+    
+    .branding p {
+        display: none;
+    }
+
+    .login-card {
+        z-index: 0;
+    }
+
+    .register-container {
+        flex-direction: column;
+        position: relative;
+    }
+
+    .register-left {
+        width: 100%;
+        height: 50%;
+        position: absolute;
+        background: none;
+        overflow: visible;
+        z-index: 2;
+    }
+    
+    .register-left::before {
+        display: none;
+    }
+
+    .register-right {
+        width: 100%;
+        height: 100%;
+        background: url('/static/pattern.jpg') center center / cover no-repeat;
+        position: absolute;
+        z-index: 1;
+    }
+
+    .register-right::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.568); /* semi-transparent gray */
+        z-index: 0;
+    }
+    
+    .branding-texts {
+        position: absolute;
+        z-index: 1;
+        text-align: center;
+        color: white;
+        padding: 20px;
+    }
+    
+    .branding-texts h1 {
+        margin-bottom: 60%;
+    }
+    
+    .branding-texts p {
+        display: none;
+    }
+
+    .register-card {
+        width: 80%;
+        max-width: 400px;
+        height: 60%;
+        margin-top: 10%;
+        overflow-y: scroll;
+    }
+
+    /* width */
+    ::-webkit-scrollbar {
+        width: 7px;
+    }
+
+    /* Track */
+    ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    /* Handle */
+    ::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 50px;
+    }
+
+    /* Handle on hover */
+    ::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+
+    .register-card p {
+        text-align: left;
+        line-height: 1;
+        font-size: 0.9rem;
+    }
 }
