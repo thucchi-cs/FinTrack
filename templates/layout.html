@@ -17,10 +17,14 @@
             <!-- Navigation bar if logged in -->
             {% if session['user_id'] %}
             <nav class="navbar">
+
                 <!-- Logo -->
                 <div class="nav-left">
                     <div class="logo">💰 FinTrack</div>
                 </div>
+                
+                <!-- Hamburger Menu -->
+                <button class="hamburger" id="hamburger">&#9776;</button>
                 
                 <!-- Link to pages -->
                 <div class="nav-center">
@@ -39,6 +43,23 @@
                     </div>
                 </div>
             </nav>
+
+            
+            <!-- Navigation links -->
+            <div class="hamburger-menu" id="navLinks">
+                <div class="mobile-menu">
+                    <a class="nav-link {% if page == "dashboard" %}active {% endif %}" href="/dashboard">Dashboard</a>
+                    <a class="nav-link {% if page == "analysis" %}active {% endif %}" href="/analysis">Analysis</a>
+                    <a class="nav-link {% if page == "transactions" %}active {% endif %}" href="/transactions">Transactions</a>
+                    <div class="dropdown">
+                        <button class="dropbtn">{{session["username"]}} ▼</button>
+                        <div class="dropdown-content">
+                            <a href="/logout">Logout</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             {% endif %}  
         </header>
 

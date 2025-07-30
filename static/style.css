@@ -338,7 +338,6 @@
     text-decoration: underline;
 }
   
-/* HERE NOW */
 /* General navbar style */
 .navbar {
     display: flex;
@@ -358,6 +357,10 @@
     font-weight: bold;
 }
   
+.hamburger-menu {
+    display: none;
+}
+
 /* Center nav links */
 .nav-center {
     display: flex;
@@ -447,8 +450,12 @@
 .dropdown:hover .dropdown-content {
     display: block;
 }
-  
 
+.hamburger {
+    display: none;
+}
+  
+/* HERE NOW */
 .chart-card {
     background-color: white;
     border-radius: 1rem;
@@ -1038,5 +1045,60 @@ canvas {
         text-align: left;
         line-height: 1;
         font-size: 0.9rem;
+    }
+
+    .hamburger {
+        display: block;
+        font-size: 2rem;
+        background: none;
+        border: none;
+        color: white;
+        cursor: pointer;
+    }
+    
+    /* Logo */
+    .logo {
+        font-size: 1.4rem;
+        font-weight: bold;
+    }
+    
+    /* Center nav links */
+    .nav-center, .nav-right {
+        display: none;
+    }
+    
+    .nav-link {
+        color: rgb(255, 255, 255);
+        text-decoration: none;
+        font-weight: 500;
+        position: relative;
+        padding-bottom: 4px;
+        transition: color 0.3s ease;
+    }
+
+    .hamburger-menu.show {
+        display: flex;
+        flex-direction: column;
+        background-color: red;
+        text-align: center;
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 60vh;
+        width: 100vw;
+        background: rgba(0, 0, 0, 0.8); /* semi-transparent */
+        z-index: 999;
+        justify-content: flex-start;
+        align-items: center;
+        /* gap: 10%; */
+    }
+    
+    .mobile-menu {
+        margin-top: 30%;
+        display: flex;
+        flex-direction: column;
+        gap: 10%;
+        justify-content: center;
+        height: 50%;
     }
 }

@@ -396,3 +396,14 @@ if (window.location.pathname == "/login" || window.location.pathname == "/regist
         };
     })
 }
+
+const hamburger = document.getElementById('hamburger');
+const navLinks = document.getElementById('navLinks');
+
+hamburger.addEventListener('click', () => {
+    navLinks.classList.toggle('show');
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+    navLinks.classList.remove("show")
+})
