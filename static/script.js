@@ -1,3 +1,5 @@
+const winWidth = window.innerWidth;
+
 // Function to count how many decimal places are in a number
 function countDecimalPlaces(number) {
     let decimal = number.indexOf(".")
@@ -131,14 +133,18 @@ async function displayCharts() {
 
 // Create Line graph of account balances over the month
 function createLineGraph(element, labels, values, color) {
+    const radius = winWidth < 1000 ? 1 : 3;
+    const borderW = winWidth < 1000 ? 1 : 5;
+
     // store data in Array
     let data = {
         labels: labels,
         datasets: [{
             data: values,
             borderColor: color,
-            borderWidth: 5,
-            pointHitRadius: 10
+            borderWidth: borderW,
+            pointHitRadius: 10,
+            pointRadius: radius
         }]
     }
 

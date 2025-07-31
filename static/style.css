@@ -455,7 +455,6 @@
     display: none;
 }
   
-/* HERE NOW */
 .chart-card {
     background-color: white;
     border-radius: 1rem;
@@ -529,6 +528,7 @@ canvas {
     color: white;
 }
 
+/* HERE NOW */
 .analysis-tab {
     padding: 2rem;
     display: flex;
@@ -1078,7 +1078,7 @@ canvas {
         left: 0;
         height: 60vh;
         width: 100vw;
-        background: rgba(0, 0, 0, 0.8); /* semi-transparent */
+        background: rgba(0, 0, 0, 0.9); /* semi-transparent */
         z-index: 999;
         justify-content: flex-start;
         align-items: center;
@@ -1093,4 +1093,43 @@ canvas {
         justify-content: center;
         height: 50%;
     }
+
+    .chart-card {
+        border: none;
+        padding: 0.5rem; 
+        box-shadow: none;
+        max-width: 150%;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+    }
+
+    .balance-info {
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .month-summary {
+        margin-bottom: 2rem;
+    }
+
+    .chart-title {
+        margin-bottom: 1rem;
+    }
+
+    #balance_chart {
+        margin-top: 1rem;
+    }
+    
+    .card-footer-link {
+        padding: 0.5rem 0.75rem;
+        border-radius: 1rem;
+        width: 90%;
+        font-size: 0.8rem;
+        margin: 2rem auto;
+    }
+
+    .card-footer-link .arrow {
+        font-size: 1.4rem; /* ← increase this for a bigger arrow */
+    } 
 }
