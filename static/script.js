@@ -419,3 +419,7 @@ hamburger.addEventListener('click', () => {
 document.addEventListener("DOMContentLoaded", () => {
     navLinks.classList.remove("show")
 })
+
+fetch(`/set_screen_size?width=${winWidth}`, {
+    method: "POST"
+})

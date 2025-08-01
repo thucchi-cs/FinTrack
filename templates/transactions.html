@@ -61,6 +61,7 @@
                     <span class="date">{{t["date_transacted"]|date}}</span>
                     <div class="actions">
                         {% if not t["deleted"] %}
+                            <button class="actions-btn">⋮</button>
                             <form action="/edit_transaction" method="post" id="edit-{{t["transaction_id"]}}">
                                 <input hidden value={{t["transaction_id"]}} name="id">
                                 <button class="edit-btn" type="submit">✏️</button>
