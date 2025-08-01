@@ -696,6 +696,10 @@ canvas {
     cursor: pointer;
 }
 
+.mobile-actions {
+    display: none;
+}
+
   /* Popup Styles */
 .popup {
     position: fixed;
@@ -1183,11 +1187,11 @@ canvas {
     .transaction-card {
         display: grid;
         grid-template-columns: 20% 20% 40% 9% 10%;
-        width: 100%;
+        width: 88%;
         padding: 0;
         border-radius: 0;
         box-shadow: none;
-        border-top-color: rgba(0,0,0,0.4);
+        border-color: rgba(85, 85, 85, 0.5);
         border-width: 1px 0;
         border-style: solid;
         border-bottom-width: 0;
@@ -1197,11 +1201,25 @@ canvas {
         height: 8vh;
     }
 
-    .transaction-card .restore-btn {
-        color:red;
-        display: none;
+    .mobile-actions button {
+        background: none;
+        border: none;
+        font-size: 1.2rem;
+        cursor: pointer;
     }
-    
+
+    .mobile-actions {
+        display: flex;
+        justify-content: center;
+        margin-left: 15px;
+    }
+
+    .actions-options {
+        position: relative;
+        background-color: red;
+        top: auto
+    }
+
     .transaction-card.deleted::before {
         width: 90%;
     }
@@ -1216,19 +1234,6 @@ canvas {
     }
     
     .transaction-card .actions {
-        display: flex;
-        gap: 0.5rem;
-        justify-content: flex-end;
-    }
-    
-    .actions button {
-        background: none;
-        border: none;
-        font-size: 1.2rem;
-        cursor: pointer;
-    }
-
-    .actions .edit-btn, .actions .delete-btn {
         display: none;
     }
 

@@ -59,9 +59,11 @@
                     <span class="amount">{% if t["amount"] < 0%}-{% else %}+{% endif %} {{(t["amount"]|abs)|usd}}</span>
                     <span class="category">{{t["categories"]["category"]}}</span>
                     <span class="date">{{t["date_transacted"]|date}}</span>
+                    <div class="mobile-actions">
+                        <button class="actions-btn">⋮</button>
+                    </div>
                     <div class="actions">
                         {% if not t["deleted"] %}
-                            <button class="actions-btn">⋮</button>
                             <form action="/edit_transaction" method="post" id="edit-{{t["transaction_id"]}}">
                                 <input hidden value={{t["transaction_id"]}} name="id">
                                 <button class="edit-btn" type="submit">✏️</button>
@@ -77,6 +79,12 @@
                             </form>
                         {% endif %}
                     </div>
+                </div>
+
+                <div class="actions-options">
+                    {% if not t["deleted"] %}
+                    {% else %}
+                    {% endif %}
                 </div>
             {% endfor %}
 
