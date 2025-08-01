@@ -25,6 +25,9 @@ function createBarGraph(element, labels, values, colors) {
     avg /= values.length
     avgData = Array(values.length).fill(avg)
 
+    // responsive font size
+    const font = winWidth < 1000 ? 10 : 12;
+
     // Store data in array
     let data = {
         labels: labels,
@@ -87,7 +90,10 @@ function createBarGraph(element, labels, values, colors) {
             scales: {
                 x: {
                     ticks: {
-                        padding: 0
+                        padding: 0,
+                        font: {
+                            size: font
+                        }
                     },
                     grid: {
                         offset: true
