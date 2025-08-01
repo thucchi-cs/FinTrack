@@ -6,8 +6,8 @@
     <div class="add-transaction-container">
         <form action="/add_transaction" method="get">
             <button class="add-transaction-btn" type="submit">
-            <span class="plus-icon">+</span>
-            <span class="btn-label">Add Transaction</span>
+                <span class="plus-icon">+</span>
+                <span class="btn-label">Add Transaction</span>
             </button>
         </form>
     </div>
@@ -62,6 +62,27 @@
                     <div class="mobile-actions">
                         <button class="actions-btn">⋮</button>
                     </div>
+                    
+                    {% if not t["deleted"] %}
+                        <div class="actions-options on">
+                            <form action="/edit_transaction" method="post" id="edit-{{t["transaction_id"]}}">
+                                <input hidden value={{t["transaction_id"]}} name="id">
+                                <button class="edit-btn" type="submit">✏️</button>
+                            </form>
+                            <div class="line"></div>
+                            <button class="delete-btn" onclick="confirmDelete({{t["transaction_id"]}})">🗑️</button>
+                            <form action="/delete_transaction" method="post" id="delete-{{t["transaction_id"]}}">
+                                <input hidden value={{t["transaction_id"]}} name="id">
+                            </form>                        
+                        </div>
+                    {% else %}
+                        <div class="actions-options off">
+                            <form action="/restore_transaction" method="post" id="restore-{{t["transaction_id"]}}">
+                                <input hidden value={{t["transaction_id"]}} name="id">
+                                <button class="restore-btn" type="submit">↻ Restore</button>
+                            </form>
+                        </div>
+                    {% endif %}
                     <div class="actions">
                         {% if not t["deleted"] %}
                             <form action="/edit_transaction" method="post" id="edit-{{t["transaction_id"]}}">
@@ -81,11 +102,6 @@
                     </div>
                 </div>
 
-                <div class="actions-options">
-                    {% if not t["deleted"] %}
-                    {% else %}
-                    {% endif %}
-                </div>
             {% endfor %}
 
             <!-- Confirmation Popup -->

@@ -390,6 +390,20 @@ if (window.location.pathname == "/transactions") {
         sortPanel.classList.toggle("hidden")
     })
 
+    let actionsBtns = document.querySelectorAll(".actions-btn");
+    actionsBtns.forEach(btn => {
+        let actionsPanel = btn.parentElement.parentElement.querySelector(".actions-options")
+        btn.addEventListener("click", () => {
+            actionsPanel.classList.toggle("active")
+        })
+
+        document.addEventListener('click', event => {
+            if ((!btn.contains(event.target)) && (!actionsPanel.contains(event.target))) {
+                actionsPanel.classList.remove("active")                
+            }
+        })
+    })
+
 }
 
 // Show / hide password
