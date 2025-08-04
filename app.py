@@ -438,6 +438,7 @@ def get_categories():
     # Return labels and values for charts
     return jsonify({"labels": list(values.keys()), "values": list(values.values())})
 
+# Get screen size for mobile responsiveness
 @app.route("/set_screen_size", methods=["POST"])
 def set_screen_size():
     width = request.args.get("width")

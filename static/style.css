@@ -890,33 +890,6 @@ canvas {
         overflow-y: scroll;
     }
 
-    /* width */
-    ::-webkit-scrollbar {
-        width: 7px;
-    }
-
-    /* Track */
-    ::-webkit-scrollbar-track {
-        background: #f1f1f1;
-    }
-
-    /* Handle */
-    ::-webkit-scrollbar-thumb {
-        background: #888;
-        border-radius: 50px;
-    }
-
-    /* Handle on hover */
-    ::-webkit-scrollbar-thumb:hover {
-        background: #555;
-    }
-
-    .register-card p {
-        text-align: left;
-        line-height: 1;
-        font-size: 0.9rem;
-    }
-
     .hamburger {
         display: block;
         font-size: 2rem;

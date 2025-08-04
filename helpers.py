@@ -14,8 +14,10 @@ def format_usd(num):
 def format_date(date):
     date = datetime.datetime.strptime(date, "%Y-%m-%d")
     if session.get("width", 0) >= 1000:
+        # Format date for desktops
         month = date.strftime('%B')[:3]
         return f"{month} {date.day}, {date.year}"
+    # Format date for mobile
     return f"{date.month}/{date.day}/{str(date.year)[2:]}"
 
 # Get absolute value of number
