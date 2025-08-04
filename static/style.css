@@ -1270,57 +1270,59 @@ canvas {
     }
 
     .add-transaction-container {
-        position: fixed;
-        top: 5rem;
-        right: 2rem;
+        position: absolute;
+        top: 10rem;
+        /* right: 2rem; */
+        left: 1.5rem;
         z-index: 100;
-        display: none;
+        /* background-color: red; */
     }
     
     .add-transaction-btn {
         display: flex;
         align-items: center;
-        background-color: #007bffbe;
         color: rgb(255, 255, 255);
         border: none;
-        border-radius: 70px;
-        padding: 1rem;
-        font-size: 1.2rem;
+        border-radius: 50px;
+        padding: 0;
+        font-size: 0.75rem;
         font-weight: bold;
         cursor: pointer;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        transition: width 0.3s ease, padding 0.3s ease;
+        transition: none;
         overflow: visible;
-        width: 70px;
-        height: 70px;
+        width: 35vw;
+        height: 1rem;
         justify-content: center;
         vertical-align: middle;
     }
 
     .plus-icon {
-        /* line-height: 50%; */
-        font-size: 1.7rem;
-        transition: margin-right 0.3s ease;
-        line-height: 1;
+        font-size: 0.75rem;
+        font-weight: bolder;
+        transition: none;
+        line-height: 0.5;
+        /* background-color: red; */
     }
     
     .btn-label {
         white-space: nowrap;
-        margin-left: 0.5rem;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-        display: none;
+        margin-left: 5px;
+        opacity: 1;
+        transition: none;
+        display: inline;
         line-height: 1;
     }
     
     .add-transaction-btn:hover {
-        width: 220px;
-        justify-content: start;
-        padding-left: 1.5rem;
+        width: 35vw;
+        justify-content: center;
+        padding: 0;
     }
     
     .add-transaction-btn:hover .plus-icon {
-        margin-right: 0.5rem;
+        margin: 0;
+        padding: 0;
     }
 
     .add-transaction-btn:hover .btn-label {
