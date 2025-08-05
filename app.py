@@ -5,9 +5,10 @@ from flask_session import Session
 from supabase import create_client, Client
 from helpers import *
 from werkzeug.security import generate_password_hash
-
+import os
 
 app = Flask(__name__)
+app.secret_key = os.environ.get("FLASK_SECRET_KEY")
 # flask run --debug
 
 # Set up jinja filters
@@ -22,8 +23,8 @@ app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
 # Set up database
-db_url = "https://afrkbgvvhkkhujmskchj.supabase.co"
-db_key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFmcmtiZ3Z2aGtraHVqbXNrY2hqIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0MzY1MDUzMiwiZXhwIjoyMDU5MjI2NTMyfQ.4w1zk-9Jx9xUo-7TWwbHywKmFJO0DkRkllicFjiHLLs"
+db_url = os.environ.get("DB_URL")
+db_key = os.environ.get("DB_KEY")
 db: Client = create_client(db_url, db_key)
 
 # Website homepage

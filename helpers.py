@@ -132,3 +132,6 @@ def set_session_user(db, username):
 def get_user_balance(db, user_id):
     balance = list(db.table("balances").select("current_balance").eq("user_id", user_id).execute())[0][1][0].get("current_balance")
     return balance
+
+import secrets
+print(secrets.token_hex(32))
