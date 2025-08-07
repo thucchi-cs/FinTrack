@@ -1,7 +1,6 @@
 from calendar import monthrange
 from datetime import date, timedelta
 from flask import Flask, render_template, redirect, request, flash, session, jsonify
-from flask_session import Session
 from supabase import create_client, Client
 from helpers import *
 from werkzeug.security import generate_password_hash
@@ -18,9 +17,12 @@ app.jinja_env.filters["date"] = format_date
 app.jinja_env.globals["today"] = get_today
 
 # Set up web app
-app.config["SESSION_PERMANENT"] = False
-app.config["SESSION_TYPE"] = "filesystem"
-Session(app)
+app.config.update(
+    SECRET_KEY=os.environ.get("FLASK_SECRET_KEY"),
+    SESSION_COOKIE_SAMESITE='None',
+    SESSION_COOKIE_SECURE=True
+)
+# Session(app)
 
 # Set up database
 db_url = os.environ.get("DB_URL")
