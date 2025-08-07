@@ -93,7 +93,11 @@ def register():
         password = request.form.get("password")
         password2 = request.form.get("password2")
         student = request.form.get("student")
-        balance = float(request.form.get("balance"))
+        balance = request.form.get("balance")
+        if balance == "":
+            balance = 0
+        balance = float(balance)
+        print(balance)
         
         # Check for input validity
         if check_valid_registration(db, username, password, password2, balance):
@@ -450,3 +454,7 @@ def set_screen_size():
 def get_session():
     print(dict(session))
     return dict(session)
+
+@app.route("/secret")
+def get_secret():
+    return os.environ.get("FLASK_SECRET_KEY")
