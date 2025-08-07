@@ -1,7 +1,7 @@
 # FinTrack
 A simple tool to track your personal finances. Made easy for students. This web app is now mobile responsive. It allows users to input their financial data and see analysis with easy to understand charts.
 
-[Website link](https://fintrack-zobt.onrender.com/)
+[Website link](https://fintrack-thucchi-cs.vercel.app/)
 
 ![alt text](image.png)
 
