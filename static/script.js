@@ -463,5 +463,16 @@ async function startCamera() {
 // Add receipt page
 if (window.location.pathname == "/add_receipt") {
     // start camera
-    window.addEventListener("load", startCamera)
+    window.addEventListener("load", startCamera);
+
+    const video = document.getElementById("camera-video");
+    const picBtn = document.getElementById("take-pic");
+    const canvas = document.getElementById("pic-canvas");
+
+    picBtn.addEventListener("click", () => {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
+        const imgURL = canvas.toDataURL("image/jpeg");
+    })
 }
