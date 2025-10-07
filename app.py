@@ -204,6 +204,14 @@ def add_transaction():
     # Open add transactions page
     return render_template("add_transaction.html", add=True, edit=False, categories=session["categories"])
 
+@app.route("/add_receipt", methods=["GET", "POST"])
+@login_required
+def add_receipt():
+    if request.method == "POST":
+        pass
+
+    return render_template("add_receipts.html")
+
 # Edit a transaction page
 @app.route("/edit_transaction", methods=["POST"])
 @login_required

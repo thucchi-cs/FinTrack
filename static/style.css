@@ -671,9 +671,10 @@ canvas {
     top: 5rem;
     right: 2rem;
     z-index: 100;
+    align-items: flex-end;
 }
   
-.add-transaction-btn {
+#add-transaction-btn {
     display: flex;
     align-items: center;
     background-color: #007bffbe;
@@ -685,12 +686,15 @@ canvas {
     font-weight: bold;
     cursor: pointer;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    transition: width 0.3s ease, padding 0.3s ease;
     overflow: visible;
     width: 70px;
     height: 70px;
     justify-content: center;
     vertical-align: middle;
+}
+
+.addOp-btn {
+    display: block;
 }
 
 .plus-icon {
@@ -707,21 +711,6 @@ canvas {
     transition: opacity 0.3s ease;
     display: none;
     line-height: 1;
-}
-  
-.add-transaction-btn:hover {
-    width: 220px;
-    justify-content: start;
-    padding-left: 1.5rem;
-}
-  
-.add-transaction-btn:hover .plus-icon {
-    margin-right: 0.5rem;
-}
-
-.add-transaction-btn:hover .btn-label {
-    opacity: 1;
-    display: inline;
 }
 
 .add-transaction-page {

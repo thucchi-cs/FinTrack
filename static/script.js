@@ -383,11 +383,11 @@ if (window.location.pathname == "/transactions") {
         closePopup();
     });
 
-    // Open/close sort panel
-    sortPanel = document.getElementById("sortOptionsPanel")
-    optionsBtn = document.getElementById("sortMenuToggle")
-    optionsBtn.addEventListener("click", () => {
-        sortPanel.classList.toggle("hidden")
+    // Open/close add panel
+    addPanel = document.getElementById("add-transaction-options")
+    addBtn = document.getElementById("add-transaction-btn")
+    addBtn.addEventListener("click", () => {
+        addPanel.classList.toggle("hidden")
     })
 
     let actionsBtns = document.querySelectorAll(".actions-btn");
@@ -439,3 +439,29 @@ if (window.location.pathname == "/login" || window.location.pathname == "/regist
 fetch(`/set_screen_size?width=${winWidth}`, {
     method: "POST"
 })
+
+// Access Camera
+async function startCamera() {
+    const video = document.getElementById("camera-video");
+
+    try {
+        // turn on camera
+        const stream = await navigator.mediaDevices.getUserMedia({video: true});
+
+        // update camera video feed
+        video.srcObject = stream;
+        video.onloadedmetadata = () => {
+            video.play();
+        }
+        
+    } catch (error) {
+        // error
+        console.error("Cannot access camera:", error);
+    }
+} 
+
+// Add receipt page
+if (window.location.pathname == "/add_receipt") {
+    // start camera
+    window.addEventListener("load", startCamera)
+}
